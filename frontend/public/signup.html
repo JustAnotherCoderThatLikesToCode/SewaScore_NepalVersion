@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>SewaScore — Sign Up</title>
+
+<style>
+  :root{
+    --accent-a:#06b6d4;
+    --accent-b:#7c3aed;
+    --accent-c:#ec4899;
+    --bg-white:#ffffff;
+  }
+
+  /* ---------- BASE ---------- */
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+  body{
+    background: var(--bg-white);
+    color:#0f172a;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- BACKGROUND ROOT (aurora, fog, dust, orbs) ---------- */
+  .bg-root{position:fixed;inset:0;pointer-events:none;z-index:-20;overflow:hidden}
+  .bg-parallax{position:absolute;inset:0;transition:transform .12s linear;will-change:transform}
+
+  /* AURORA (soft glow layers) */
+  .aurora{
+    position:absolute;inset:-30%;mix-blend-mode:screen;filter:blur(36px) saturate(1.45);
+    background:
+      radial-gradient(1100px 520px at 12% 12%, rgba(6,182,212,0.78), transparent 30%),
+      radial-gradient(1200px 540px at 88% 18%, rgba(124,58,237,0.72), transparent 30%),
+      radial-gradient(900px 480px at 50% 82%, rgba(236,72,153,0.48), transparent 30%);
+    animation:auroraShift 16s ease-in-out infinite alternate;
+    opacity:0.95;
+    will-change:transform;
+  }
+  @keyframes auroraShift{0%{transform:translate3d(-3%,-4%,0) scale(1)}100%{transform:translate3d(3%,4%,0) scale(1.05)}}
+
+  /* FOG (soft blurred blobs) */
+  .fog-layer{position:absolute;inset:0;z-index:-18;will-change:transform}
+  .fog-blob{
+    position:absolute;border-radius:50%;
+    background:radial-gradient(circle at 30% 30%, rgba(255,255,255,0.98), rgba(210,220,230,0.7) 40%, rgba(160,170,190,0.12) 70%, transparent 100%);
+    filter:blur(28px) saturate(1.05);opacity:.12;will-change:transform,opacity;
+  }
+  @keyframes fogMoveA{0%{transform:translate3d(0,0,0) scale(.9);opacity:.06}50%{opacity:.14}100%{transform:translate3d(160px,-420px,0) scale(1.05);opacity:0}}
+  @keyframes fogMoveB{0%{transform:translate3d(0,0,0) scale(1);opacity:.08}50%{opacity:.16}100%{transform:translate3d(-200px,-360px,0) scale(.9);opacity:0}}
+  @keyframes fogMoveC{0%{transform:translate3d(0,0,0) scale(.95);opacity:.05}50%{opacity:.12}100%{transform:translate3d(120px,-480px,0) scale(.85);opacity:0}}
+
+  /* DUST (tiny particles) */
+  .dust-layer{position:absolute;inset:0;z-index:-16;will-change:transform}
+  .dust{
+    position:absolute;border-radius:50%;background:rgba(120,130,140,0.85);
+    filter:blur(.6px) saturate(.9);will-change:transform,opacity;
+    animation:dustFloat linear infinite;opacity:.85;
+  }
+  .dust.small{width:4px;height:4px;opacity:.6;filter:blur(.4px)}
+  .dust.large{width:10px;height:10px;opacity:.95;filter:blur(1.2px)}
+  @keyframes dustFloat{0%{transform:translate3d(0,0,0) scale(1);opacity:.2}40%{opacity:.7}80%{transform:translate3d(40px,-220px,0) scale(1.05);opacity:.95}100%{transform:translate3d(-80px,-480px,0) scale(.9);opacity:0}}
+
+  /* ORBS (colorful blurred circles) */
+  .orb-layer{position:absolute;inset:0;z-index:-15;will-change:transform}
+  .orb{
+    position:absolute;border-radius:50%;filter:blur(6px) saturate(1.1);
+    will-change:transform,opacity;animation:orbFloat linear infinite;opacity:.95;
+    mix-blend-mode:screen;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.06);
+  }
+  @keyframes orbFloat{0%{transform:translate3d(0,0,0) scale(.9);opacity:.6}50%{transform:translate3d(40px,-120px,0) scale(1.15);opacity:1}100%{transform:translate3d(-60px,-260px,0) scale(.85);opacity:0}}
+
+  /* ---------- SIGNUP CARD (glow + animations) ---------- */
+  .signup-card-wrap{
+    position:relative;
+    z-index:10;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    padding:40px 20px;
+  }
+
+  .signup-card{
+    width:540px;
+    max-width:94%;
+    margin:0 auto;
+    padding:46px 40px;
+    border-radius:20px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(250,250,250,0.94));
+    backdrop-filter: blur(14px) saturate(1.2);
+    border: 1px solid rgba(255,255,255,0.7);
+    box-shadow:
+      0 30px 80px rgba(15,23,42,0.08),
+      0 8px 30px rgba(124,58,237,0.06),
+      inset 0 1px 0 rgba(255,255,255,0.6);
+    transform: translateY(18px) scale(.995);
+    opacity:0;
+    animation:cardEntrance .9s cubic-bezier(.2,.9,.2,1) .12s forwards;
+    position:relative;
+    overflow:visible;
+  }
+
+  .signup-card::before{
+    content:"";
+    position:absolute;
+    inset:-2px;
+    border-radius:22px;
+    padding:2px;
+    background: linear-gradient(90deg, rgba(6,182,212,0.14), rgba(124,58,237,0.14), rgba(236,72,153,0.08));
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events:none;
+    filter: blur(12px);
+    opacity:0.95;
+    animation: borderPulse 6s ease-in-out infinite alternate;
+  }
+
+  @keyframes borderPulse{0%{filter:blur(8px);opacity:.85}100%{filter:blur(18px);opacity:1}}
+  @keyframes cardEntrance{to{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes cardFloat{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+  .signup-card:hover{animation:cardFloat 6s ease-in-out infinite}
+
+  .signup-card h2{
+    margin:0 0 12px 0;
+    font-size:2.4rem;
+    font-weight:900;
+    text-align:center;
+    background:linear-gradient(90deg,var(--accent-a),var(--accent-b));
+    -webkit-background-clip:text;color:transparent;
+    filter: drop-shadow(0 6px 18px rgba(124,58,237,0.12));
+    letter-spacing:-0.6px;
+  }
+
+  .signup-sub{ text-align:center;color:rgba(15,23,42,0.6);font-size:0.95rem;margin-bottom:18px; }
+
+  .field{ margin-bottom:14px; position:relative; }
+
+  .signup-card input{
+    width:100%;
+    padding:14px 16px;
+    border-radius:12px;
+    border:1px solid rgba(15,23,42,0.06);
+    background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.95));
+    font-size:1rem;
+    color:#0f172a;
+    transition:box-shadow .22s, transform .12s, border-color .18s;
+    outline:none;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+
+  .signup-card input::placeholder{ color:rgba(15,23,42,0.35) }
+
+  .signup-card input:focus{
+    border-color: rgba(124,58,237,0.45);
+    box-shadow: 0 8px 30px rgba(124,58,237,0.06), 0 0 18px rgba(6,182,212,0.06);
+    transform: translateY(-2px);
+  }
+
+  .row{ display:flex; gap:12px; }
+  .half{ flex:1; }
+
+  .signup-btn{
+    width:100%;
+    padding:14px 16px;
+    margin-top:6px;
+    border-radius:12px;
+    border:none;
+    cursor:pointer;
+    font-weight:800;
+    font-size:1.05rem;
+    color:white;
+    background: linear-gradient(90deg,var(--accent-a),var(--accent-b));
+    box-shadow:
+      0 10px 30px rgba(6,182,212,0.12),
+      0 6px 18px rgba(124,58,237,0.12),
+      0 2px 0 rgba(255,255,255,0.06) inset;
+    transition: transform .18s, box-shadow .18s;
+  }
+  .signup-btn:active{ transform:translateY(1px) scale(.998) }
+  .signup-btn:hover{
+    transform: translateY(-4px);
+    box-shadow:
+      0 18px 50px rgba(6,182,212,0.18),
+      0 12px 40px rgba(124,58,237,0.14);
+  }
+
+  .signup-link{ display:block; text-align:center; margin-top:12px; color:rgba(15,23,42,0.6); font-size:0.95rem; }
+
+  /* shimmer */
+  .shimmer{ position:absolute; left:-40%; top:-10%; width:200%; height:40%; background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.12), rgba(255,255,255,0.02)); transform:rotate(-12deg); pointer-events:none; mix-blend-mode:overlay; animation:shimmerMove 6s linear infinite; border-radius:40%; }
+  @keyframes shimmerMove{0%{transform:translateX(-20%) rotate(-12deg)}100%{transform:translateX(20%) rotate(-12deg)}}
+
+  /* responsive */
+  @media (max-width:560px){
+    .signup-card{padding:28px 20px;border-radius:16px}
+    .signup-card h2{font-size:1.8rem}
+  }
+.signup-card {
+  width: 540px;
+  max-width: 94%;
+  margin: 0 auto;
+  padding: 46px 40px;
+  border-radius: 20px;
+
+  /* Solid visible background — no fade-in */
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(250,250,250,0.94));
+  backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgba(255,255,255,0.7);
+
+  /* Keep card on its own layer and above everything */
+  position: relative;
+  z-index: 2147483647 !important;
+  isolation: isolate;
+  transform-style: preserve-3d;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+
+  /* No entrance animation, always visible */
+  opacity: 1 !important;
+  transform: none !important;
+  transition: box-shadow .18s ease, transform .18s ease;
+  box-shadow:
+    0 30px 80px rgba(15,23,42,0.08),
+    0 8px 30px rgba(124,58,237,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+}
+/* ---------- Hover / focus popup (scale) ---------- */
+.signup-card {
+  /* keep existing visuals; add these lines or merge them */
+  will-change: transform, box-shadow;
+  transition: transform 260ms cubic-bezier(.2,.9,.2,1), box-shadow 260ms cubic-bezier(.2,.9,.2,1);
+  transform-origin: center center;
+  /* ensure card is on its own layer and visible */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  z-index: 2147483647 !important;
+}
+
+/* Scale up slightly on pointer hover or keyboard focus */
+.signup-card:hover,
+.signup-card:focus-within,
+.signup-card.popup-scale {
+  transform: scale(1.06);
+  box-shadow:
+    0 40px 100px rgba(15,23,42,0.12),
+    0 12px 40px rgba(124,58,237,0.08);
+}
+
+/* Micro bounce when scaling in (optional, subtle) */
+@keyframes popupMicro {
+  0%   { transform: scale(0.985); }
+  60%  { transform: scale(1.07); }
+  100% { transform: scale(1.06); }
+}
+
+/* Apply micro-bounce only when class is added (won't retrigger on hover) */
+.signup-card.popup-scale.animate {
+  animation: popupMicro 360ms cubic-bezier(.2,.9,.3,1) both;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .signup-card,
+  .signup-card.popup-scale,
+  .signup-card.popup-scale.animate {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+}
+/* Back button */
+.card-back{
+  position:absolute;
+  left:16px;
+  top:16px;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 10px;
+  border-radius:10px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(245,245,245,0.86));
+  border: 1px solid rgba(15,23,42,0.06);
+  color: rgba(15,23,42,0.9);
+  font-weight:700;
+  font-size:0.9rem;
+  cursor:pointer;
+  box-shadow: 0 6px 18px rgba(124,58,237,0.04);
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+  z-index:2147483650;
+  pointer-events:auto;
+  backdrop-filter: blur(6px);
+}
+
+/* Icon styling */
+.card-back-icon{
+  display:inline-flex;
+  width:20px;
+  height:20px;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  line-height:1;
+  color:var(--accent-b);
+}
+
+/* Hover and active states */
+.card-back:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(124,58,237,0.08);
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.9));
+}
+.card-back:active{ transform: translateY(0); }
+
+/* Focus visible for keyboard users */
+.card-back:focus{
+  outline: 3px solid rgba(124,58,237,0.14);
+  outline-offset:3px;
+  border-color: rgba(124,58,237,0.12);
+}
+
+/* Compact variant for very small screens */
+@media (max-width:420px){
+  .card-back{ padding:8px; left:12px; top:12px; border-radius:8px; }
+  .card-back-text{ display:none; }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .card-back{ transition:none !important; }
+}
+
+</style>
+</head>
+<body>
+
+  <!-- ---------- BACKGROUND LAYERS (kept intact) ---------- -->
+  <div class="bg-root">
+    <div class="bg-parallax" id="bgParallax">
+      <div class="aurora" id="aurora"></div>
+      <div class="fog-layer" id="fogLayer"></div>
+      <div class="dust-layer" id="dustLayer"></div>
+      <div class="orb-layer" id="orbLayer"></div>
+    </div>
+  </div>
+
+  <!-- ---------- SIGNUP CARD ---------- -->
+  <div class="signup-card-wrap">
+    <div class="signup-card" role="form" aria-labelledby="signupTitle">
+      <div class="shimmer" aria-hidden="true"></div>
+<button class="card-back" type="button" aria-label="Go back">
+  <span class="card-back-icon" aria-hidden="true">←</span>
+  <span class="card-back-text">Back</span>
+</button>
+      <h2 id="signupTitle">Create Your Account</h2>
+      <div class="signup-sub">Join SewaScore — rate services, help improve Nepal.</div>
+
+      <div class="field">
+        <input id="proxyName" type="text" placeholder="Proxy Name" autocomplete="name" />
+      </div>
+
+      <div class="row">
+        <div class="field half">
+          <input id="phoneNumber" type="tel" placeholder="Phone Number" inputmode="tel" />
+        </div>
+        <div class="field half">
+          <input id="signupEmail" type="email" placeholder="Email" autocomplete="email" />
+        </div>
+      </div>
+
+      <div class="field">
+        <input id="signupPassword" type="password" placeholder="Password" autocomplete="new-password" />
+      </div>
+
+      <button class="signup-btn" id="signupBtn" aria-label="Sign up">Sign Up</button>
+
+      <a class="signup-link" href="login.html">Already have an account? Log in</a>
+    </div>
+  </div>
+
+<script>
+  /* ---------- HELPERS ---------- */
+  function rand(min,max){return Math.random()*(max-min)+min}
+
+  /* ---------- FOG ---------- */
+  (function fog(){
+    const root=document.getElementById('fogLayer');
+    if(!root) return;
+    for(let i=0;i<14;i++){
+      const b=document.createElement('div');
+      b.className='fog-blob';
+      const w=Math.round(rand(260,760));
+      const h=Math.round(w*rand(.45,.85));
+      b.style.width=w+'px';
+      b.style.height=h+'px';
+      b.style.left=(rand(-.12,1.12)*100)+'%';
+      b.style.top=(rand(.6,1.05)*100)+'%';
+      const anim=i%3===0?'fogMoveA':i%3===1?'fogMoveB':'fogMoveC';
+      b.style.animation=`${anim} ${Math.round(rand(28,72))}s linear infinite`;
+      root.appendChild(b);
+    }
+  })();
+
+  /* ---------- DUST ---------- */
+  (function dust(){
+    const root=document.getElementById('dustLayer');
+    if(!root) return;
+    for(let i=0;i<140;i++){
+      const d=document.createElement('div');
+      d.className='dust';
+      if(Math.random()<.12) d.classList.add('large');
+      else if(Math.random()<.35) d.classList.add('small');
+      d.style.left=(Math.random()*100)+'%';
+      d.style.top=(rand(.6,1.05)*100)+'%';
+      d.style.animationDuration=rand(8,18)+'s';
+      root.appendChild(d);
+    }
+  })();
+
+  /* ---------- ORBS ---------- */
+  (function orbs(){
+    const root=document.getElementById('orbLayer');
+    if(!root) return;
+    for(let i=0;i<26;i++){
+      const o=document.createElement('div');
+      o.className='orb';
+      const size=Math.round(rand(28,88));
+      o.style.width=size+'px';
+      o.style.height=size+'px';
+      o.style.left=(Math.random()*100)+'%';
+      o.style.top=(rand(.6,1.05)*100)+'%';
+      o.style.animationDuration=rand(6,14)+'s';
+      const hue=Math.round(rand(180,320));
+      o.style.background=`radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), hsla(${hue},85%,80%,.95) 35%, hsla(${hue},85%,70%,.28) 70%, transparent)`;
+      // subtle border to keep visibility on white
+      o.style.border = '1px solid rgba(255,255,255,0.12)';
+      root.appendChild(o);
+    }
+  })();
+/* ---------- PARALLAX (pause updates on card hover/focus but keep background visible) ---------- */
+(function parallax(){
+  const aur = document.getElementById('aurora'),
+        fog = document.getElementById('fogLayer'),
+        dust = document.getElementById('dustLayer'),
+        orbs = document.getElementById('orbLayer'),
+        bgPar = document.getElementById('bgParallax'),
+        card = document.querySelector('.signup-card');
+
+  if (!bgPar) return;
+
+  // state
+  let targetX = 0, targetY = 0;
+  let currentX = 0, currentY = 0;
+  let t = 0;
+  let paused = false;
+  let lastMove = 0;
+
+  // ensure neutral transforms at start
+  function setNeutralTransforms(){
+    if (aur) aur.style.transform = 'translate3d(0,0,0)';
+    if (fog) fog.style.transform = 'translate3d(0,0,0)';
+    if (dust) dust.style.transform = 'translate3d(0,0,0)';
+    if (orbs) orbs.style.transform = 'translate3d(0,0,0)';
+    if (bgPar) bgPar.style.transform = 'rotateX(0deg) rotateY(0deg)';
+  }
+  setNeutralTransforms();
+
+  // mouse handler (throttled). Ignore events that originate inside the card.
+  function onMove(e){
+    if (paused) return;
+    if (e.target && e.target.closest && e.target.closest('.signup-card')) return;
+    const now = performance.now();
+    if (now - lastMove < 12) return; // throttle
+    lastMove = now;
+    targetX = ((e.clientX || innerWidth/2) / innerWidth) - 0.5;
+    targetY = ((e.clientY || innerHeight/2) / innerHeight) - 0.5;
+  }
+  window.addEventListener('mousemove', onMove, { passive: true });
+
+  // Pause updates but DO NOT hide the background
+  function pauseUpdates(){
+    if (paused) return;
+    paused = true;
+    // set targets to neutral so we lerp back to center
+    targetX = 0; targetY = 0;
+    // immediately set neutral transforms to avoid transient occlusion
+    setNeutralTransforms();
+  }
+
+  function resumeUpdates(){
+    if (!paused) return;
+    paused = false;
+    // small nudge so motion resumes smoothly
+    targetX = 0; targetY = 0;
+  }
+
+  // Attach events to pause while pointer is over card or inputs focused
+  if (card) {
+    card.addEventListener('pointerenter', pauseUpdates, { passive: true });
+    card.addEventListener('pointerleave', resumeUpdates, { passive: true });
+    card.addEventListener('pointerdown', pauseUpdates, { passive: true });
+    card.addEventListener('pointerup', resumeUpdates, { passive: true });
+    card.addEventListener('focusin', pauseUpdates);
+    card.addEventListener('focusout', resumeUpdates);
+
+    // stop pointermove from bubbling to window (extra safety)
+    card.addEventListener('pointermove', function(e){ e.stopPropagation(); }, { passive: true });
+  }
+
+  // Also pause while any input inside the card is focused (keyboard users)
+  if (card) {
+    const inputs = card.querySelectorAll('input, button, textarea, select');
+    inputs.forEach(el => {
+      el.addEventListener('focus', pauseUpdates);
+      el.addEventListener('blur', resumeUpdates);
+    });
+  }
+
+  // lerp helper
+  function lerp(a,b,n){ return (1-n)*a + n*b; }
+
+  // RAF loop: always set transforms explicitly (no accumulation)
+  function rafLoop(){
+    // smooth toward target
+    currentX = lerp(currentX, targetX, 0.12);
+    currentY = lerp(currentY, targetY, 0.12);
+
+    // idle breathing (very subtle) only when not paused
+    t += 0.006;
+    const idleX = paused ? 0 : Math.sin(t * 0.9) * 0.02;
+    const idleY = paused ? 0 : Math.cos(t * 0.7) * 0.02;
+
+    const px = currentX + idleX;
+    const py = currentY + idleY;
+
+    // apply explicit transforms (no accumulation)
+    if (aur) aur.style.transform = `translate3d(${px * 6}%, ${py * 4}%, 0)`;
+    if (fog) fog.style.transform = `translate3d(${px * 10}%, ${py * 6}%, 0)`;
+    if (dust) dust.style.transform = `translate3d(${px * 14}%, ${py * 10}%, 0)`;
+    if (orbs) orbs.style.transform = `translate3d(${px * 18}%, ${py * 12}%, 0)`;
+    if (bgPar) bgPar.style.transform = `rotateX(${py * 1.2}deg) rotateY(${px * 1.2}deg)`;
+
+    requestAnimationFrame(rafLoop);
+  }
+
+  requestAnimationFrame(rafLoop);
+})();
+
+  /* ---------- SIGNUP LOGIC (clean UX) ---------- */
+  (function signup(){
+    const btn = document.getElementById("signupBtn");
+    if(!btn) return;
+
+    btn.addEventListener("click", () => {
+      const proxy = document.getElementById("proxyName").value.trim();
+      const phone = document.getElementById("phoneNumber").value.trim();
+      const email = document.getElementById("signupEmail").value.trim();
+      const pass = document.getElementById("signupPassword").value;
+
+      if (!proxy || !phone || !email || !pass) {
+        flashButton("Fill all fields");
+        return;
+      }
+
+      const normalizedPhone = phone.replace(/[^\d+]/g, '');
+
+      localStorage.setItem("userProxy", proxy);
+      localStorage.setItem("userPhone", normalizedPhone);
+      localStorage.setItem("userEmail", email);
+      localStorage.setItem("userPassword", pass);
+
+      btn.disabled = true;
+      const original = btn.textContent;
+      btn.textContent = "Creating account…";
+      btn.style.transform = "scale(.98)";
+      setTimeout(() => {
+        btn.textContent = "Account created!";
+        btn.style.transform = "scale(1.02)";
+        setTimeout(()=> window.location.href = "login.html", 700);
+      }, 900);
+    });
+
+    function flashButton(msg){
+      const btn = document.getElementById("signupBtn");
+      const original = btn.textContent;
+      btn.textContent = msg;
+      btn.style.background = "linear-gradient(90deg,#f97316,#fb7185)";
+      setTimeout(()=>{ btn.textContent = original; btn.style.background = ""; }, 1200);
+    }
+  })();
+  /* Optional JS fallback for touch devices or programmatic trigger
+   - Adds .popup-scale on pointerenter and removes on pointerleave
+   - Adds .animate once so the micro-bounce runs only on first entry
+*/
+(function(){
+  const card = document.querySelector('.signup-card');
+  if (!card) return;
+
+  let animated = false;
+
+  function onEnter(){
+    card.classList.add('popup-scale');
+    if (!animated) {
+      // add animate class for a single micro-bounce
+      card.classList.add('animate');
+      // remove animate after it finishes so it doesn't retrigger repeatedly
+      setTimeout(()=> card.classList.remove('animate'), 420);
+      animated = true;
+    }
+  }
+  function onLeave(){
+    card.classList.remove('popup-scale');
+  }
+
+  card.addEventListener('pointerenter', onEnter, { passive: true });
+  card.addEventListener('pointerleave', onLeave, { passive: true });
+
+  // keyboard accessibility: show on focusin, hide on focusout
+  card.addEventListener('focusin', onEnter);
+  card.addEventListener('focusout', onLeave);
+})();
+// Back button: use history.back() with fallback to a safe URL
+(function(){
+  const back = document.querySelector('.card-back');
+  if (!back) return;
+  back.addEventListener('click', (e) => {
+    e.preventDefault();
+    // Try history first
+    if (window.history && window.history.length > 1) {
+      window.history.back();
+      // small timeout fallback in case history.back() is blocked
+      setTimeout(() => {
+        if (document.visibilityState === 'visible') {
+          window.location.href = 'index.html'; // fallback page
+        }
+      }, 600);
+      return;
+    }
+    // No history: go to fallback
+    window.location.href = 'index.html';
+  }, { passive: true });
+})();
+
+</script>
+
+</body>
+</html>

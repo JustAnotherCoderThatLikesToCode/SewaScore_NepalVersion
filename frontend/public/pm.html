@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rate the Prime Minister — SewaScore</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      background: linear-gradient(180deg,#f3fbff,#e6f3ff);
+      color: #071029;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      padding: 20px;
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 900;
+      background: linear-gradient(90deg,#06b6d4,#7c3aed);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .title p {
+      margin: 4px 0 0;
+      color: #475569;
+      font-size: .95rem;
+    }
+
+    .back-btn {
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid rgba(14,30,37,0.08);
+      font-weight: 700;
+      color: #071029;
+    }
+
+    .pm-card {
+      position: relative;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(14px);
+      border-radius: 20px;
+      padding: 40px 30px;
+      border: 1px solid rgba(14,30,37,0.06);
+      box-shadow: 0 20px 50px rgba(14,30,37,0.08);
+      text-align: center;
+      max-width: 760px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    .nepal-banner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 200px;
+      background: url("NepalBanner.jpg") center/cover no-repeat;
+      opacity: 0.12;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .pm-photo {
+      width: 190px;
+      height: 190px;
+      border-radius: 50%;
+      object-fit: cover;
+      padding: 8px;
+      background: linear-gradient(135deg, #06b6d4, #7c3aed);
+      box-shadow:
+        0 0 30px rgba(6,182,212,0.40),
+        0 0 60px rgba(124,58,237,0.35);
+      animation: floatPic 7s ease-in-out infinite;
+      position: relative;
+      z-index: 2;
+    }
+
+    @keyframes floatPic {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+      100% { transform: translateY(0px); }
+    }
+
+    .pm-name {
+      font-size: 1.6rem;
+      font-weight: 900;
+      background: linear-gradient(90deg,#06b6d4,#7c3aed);
+      -webkit-background-clip: text;
+      color: transparent;
+      margin-bottom: 6px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .pm-role {
+      color: #475569;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .stars {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      font-size: 36px;
+      cursor: pointer;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .star {
+      color: #cbd5e1;
+      transition: .15s;
+    }
+
+    .star.active {
+      color: #facc15;
+      transform: scale(1.1);
+    }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(14,30,37,0.08);
+      background: rgba(255,255,255,0.9);
+      resize: none;
+      font-family: inherit;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .submit-btn {
+      padding: 12px 28px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(90deg,#06b6d4,#7c3aed);
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 1rem;
+      box-shadow: 0 12px 30px rgba(37,99,235,0.25);
+      transition: .2s;
+      position: relative;
+      z-index: 2;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 40px rgba(37,99,235,0.35);
+    }
+
+    .note {
+      margin-top: 14px;
+      font-size: .85rem;
+      color: #94a3b8;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Deep Rater Toggle */
+    .deep-toggle {
+      margin-top: 35px;
+      font-size: 1.4rem;
+      font-weight: 800;
+      background: linear-gradient(90deg,#06b6d4,#7c3aed);
+      -webkit-background-clip: text;
+      color: transparent;
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+      z-index: 2;
+    }
+
+    .deep-rater {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height .5s ease, opacity .4s ease;
+      margin-top: 10px;
+    }
+
+    .deep-rater.open {
+      max-height: 900px;
+      opacity: 1;
+    }
+
+    .deep-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.7);
+      padding: 12px 18px;
+      border-radius: 14px;
+      border: 1px solid rgba(14,30,37,0.08);
+      backdrop-filter: blur(8px);
+      margin-bottom: 12px;
+    }
+
+    .deep-row label {
+      font-weight: 700;
+      color: #071029;
+    }
+
+    .deep-stars {
+      font-size: 26px;
+      cursor: pointer;
+      color: #cbd5e1;
+      letter-spacing: 4px;
+      transition: .15s;
+    }
+
+    .deep-stars .active {
+      color: #facc15;
+      transform: scale(1.1);
+    }
+    /* Background Root */
+.bg-root {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -20;
+  overflow: hidden;
+}
+
+.bg-parallax {
+  position: absolute;
+  inset: 0;
+  transition: transform .12s linear;
+}
+
+/* Aurora */
+.aurora {
+  position: absolute;
+  inset: -30%;
+  mix-blend-mode: screen;
+  filter: blur(36px) saturate(1.45);
+  background:
+    radial-gradient(1100px 520px at 12% 12%, rgba(6,182,212,0.78), transparent 30%),
+    radial-gradient(1200px 540px at 88% 18%, rgba(124,58,237,0.72), transparent 30%),
+    radial-gradient(900px 480px at 50% 82%, rgba(236,72,153,0.48), transparent 30%);
+  animation: auroraShift 16s ease-in-out infinite alternate;
+}
+
+@keyframes auroraShift {
+  0% { transform: translate(-3%, -4%) scale(1); }
+  100% { transform: translate(3%, 4%) scale(1.05); }
+}
+
+/* Fog */
+.fog-layer { position: absolute; inset: 0; }
+.fog-blob {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, #d2dce6 40%, #a0aabe12 70%, transparent);
+  filter: blur(28px);
+  opacity: .12;
+}
+
+/* Dust */
+.dust-layer { position: absolute; inset: 0; }
+.dust {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(120,130,140,0.85);
+  filter: blur(.6px);
+  opacity: .7;
+}
+.dust.small { width: 4px; height: 4px; }
+.dust.large { width: 10px; height: 10px; }
+
+/* Orbs */
+.orb-layer { position: absolute; inset: 0; }
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(6px);
+  opacity: .9;
+  animation: orbFloat linear infinite;
+}
+
+@keyframes orbFloat {
+  0% { transform: translate(0,0) scale(.9); }
+  50% { transform: translate(40px,-120px) scale(1.15); }
+  100% { transform: translate(-60px,-260px) scale(.85); }
+}
+
+  </style>
+</head>
+
+<body>
+    <!-- Background Effects -->
+<div class="bg-root">
+  <div class="bg-parallax" id="bgParallax">
+    <div class="aurora"></div>
+    <div class="fog-layer" id="fogLayer"></div>
+    <div class="dust-layer" id="dustLayer"></div>
+    <div class="orb-layer" id="orbLayer"></div>
+  </div>
+</div>
+
+  <div class="page">
+
+    <div class="header">
+      <div class="title">
+        <h1>Rate the Prime Minister</h1>
+        <p>Your feedback helps support transparency.</p>
+      </div>
+      <a href="index.html" class="back-btn">← Back</a>
+    </div>
+
+    <div class="pm-card">
+
+      <div class="nepal-banner"></div>
+
+      <img src="balen_shah.avif" class="pm-photo">
+
+      <div class="pm-name">Prime Minister of Nepal</div>
+      <div class="pm-role">Head of Government</div>
+
+      <div class="stars" id="stars">
+        <span class="star" data-val="1">★</span>
+        <span class="star" data-val="2">★</span>
+        <span class="star" data-val="3">★</span>
+        <span class="star" data-val="4">★</span>
+        <span class="star" data-val="5">★</span>
+      </div>
+
+      <textarea id="feedback" placeholder="Write your feedback..."></textarea>
+
+      <!-- Deep Rater Toggle -->
+      <div class="deep-toggle" id="deepToggle">Deep Rater ⯆</div>
+
+      <!-- Deep Rater Section -->
+     <div class="deep-rater" id="deepRater">
+
+  <div class="deep-row">
+    <label>Work Done</label>
+    <div class="deep-stars" data-field="work_done">★ ★ ★ ★ ★</div>
+  </div>
+
+  <div class="deep-row">
+    <label>Service to People</label>
+    <div class="deep-stars" data-field="service_people">★ ★ ★ ★ ★</div>
+  </div>
+
+  <div class="deep-row">
+    <label>Honesty</label>
+    <div class="deep-stars" data-field="honesty">★ ★ ★ ★ ★</div>
+  </div>
+
+  <div class="deep-row">
+    <label>Anti-Corruption</label>
+    <div class="deep-stars" data-field="fights_corruption">★ ★ ★ ★ ★</div>
+  </div>
+
+  <div class="deep-row">
+    <label>Development Work</label>
+    <div class="deep-stars" data-field="development_work">★ ★ ★ ★ ★</div>
+  </div>
+
+  <div class="deep-row">
+    <label>Communication & Clarity</label>
+    <div class="deep-stars" data-field="communication_clarity">★ ★ ★ ★ ★</div>
+  </div>
+
+  <div class="deep-row">
+    <label>Leadership & Vision</label>
+    <div class="deep-stars" data-field="leadership_vision">★ ★ ★ ★ ★</div>
+  </div>
+
+  <div class="deep-row">
+    <label>Diplomacy & Foreign Relations</label>
+    <div class="deep-stars" data-field="diplomacy_foreign">★ ★ ★ ★ ★</div>
+  </div>
+
+  <div class="deep-row">
+    <label>Strengthening Institutions</label>
+    <div class="deep-stars" data-field="institutions">★ ★ ★ ★ ★</div>
+  </div>
+
+  <div class="deep-row">
+    <label>Long-Term Plan for Nepal</label>
+    <div class="deep-stars" data-field="longterm_plan">★ ★ ★ ★ ★</div>
+  </div>
+
+</div>
+
+
+      <button class="submit-btn" id="submitBtn">Submit Rating</button>
+
+      <div class="note">This is a UI demo. You can connect it to a backend or Google Sheet later.</div>
+    </div>
+
+  </div>
+
+  <script>
+    // Utility
+const rand = (a,b) => a + Math.random() * (b - a);
+
+// Fog
+(function fog(){
+  const root = document.getElementById("fogLayer");
+  for(let i=0;i<12;i++){
+    const b = document.createElement("div");
+    b.className = "fog-blob";
+    const w = Math.round(rand(260,760));
+    const h = Math.round(w * rand(.45,.85));
+    b.style.width = w+"px";
+    b.style.height = h+"px";
+    b.style.left = (rand(-.12,1.12)*100)+"%";
+    b.style.top = (rand(.6,1.05)*100)+"%";
+    b.style.animation = `fogMove ${Math.round(rand(28,72))}s linear infinite`;
+    root.appendChild(b);
+  }
+})();
+
+// Dust
+(function dust(){
+  const root = document.getElementById("dustLayer");
+  for(let i=0;i<120;i++){
+    const d = document.createElement("div");
+    d.className = "dust";
+    if(Math.random()<.12) d.classList.add("large");
+    else if(Math.random()<.35) d.classList.add("small");
+    d.style.left = (Math.random()*100)+"%";
+    d.style.top = (rand(.6,1.05)*100)+"%";
+    d.style.animationDuration = rand(8,18)+"s";
+    root.appendChild(d);
+  }
+})();
+
+// Orbs
+(function orbs(){
+  const root = document.getElementById("orbLayer");
+  for(let i=0;i<20;i++){
+    const o = document.createElement("div");
+    o.className = "orb";
+    const size = Math.round(rand(28,88));
+    o.style.width = size+"px";
+    o.style.height = size+"px";
+    o.style.left = (Math.random()*100)+"%";
+    o.style.top = (rand(.6,1.05)*100)+"%";
+    o.style.animationDuration = rand(6,14)+"s";
+    const hue = Math.round(rand(180,320));
+    o.style.background = `radial-gradient(circle at 30% 30%, #fff, hsla(${hue},85%,80%,.95) 35%, hsla(${hue},85%,70%,.28) 70%, transparent)`;
+    root.appendChild(o);
+  }
+})();
+
+// Parallax
+window.addEventListener("mousemove", e => {
+  const x = (e.clientX / window.innerWidth) - .5;
+  const y = (e.clientY / window.innerHeight) - .5;
+  document.getElementById("bgParallax").style.transform =
+    `translate(${x*10}px, ${y*10}px)`;
+});
+
+    const stars = document.querySelectorAll(".star");
+    let rating = 0;
+
+    stars.forEach(star => {
+      star.addEventListener("click", () => {
+        rating = parseInt(star.dataset.val);
+        stars.forEach((s, i) => s.classList.toggle("active", i < rating));
+      });
+    });
+
+    // Deep Rater Toggle
+    const deepToggle = document.getElementById("deepToggle");
+    const deepRater = document.getElementById("deepRater");
+
+    deepToggle.addEventListener("click", () => {
+      deepRater.classList.toggle("open");
+      deepToggle.textContent = deepRater.classList.contains("open")
+        ? "Deep Rater ⯅"
+        : "Deep Rater ⯆";
+    });
+
+    // Deep Rater Logic
+    const deepRatings = {};
+
+document.querySelectorAll(".deep-stars").forEach(group => {
+  const field = group.dataset.field;
+
+  const stars = group.innerText.trim().split(" ").map(() => {
+    const span = document.createElement("span");
+    span.textContent = "★";
+    return span;
+  });
+
+  group.innerHTML = "";
+  stars.forEach(s => group.appendChild(s));
+
+  group.addEventListener("click", e => {
+    if (e.target.textContent !== "★") return;
+
+    const index = [...group.children].indexOf(e.target);
+    deepRatings[field] = index + 1;
+
+    [...group.children].forEach((s, i) => {
+      s.classList.toggle("active", i <= index);
+    });
+  });
+});
+
+
+    document.getElementById("submitBtn").addEventListener("click", () => {
+      const feedback = document.getElementById("feedback").value.trim();
+
+      alert(
+        "Main Rating: " + rating +
+        "\nDeep Ratings: " + JSON.stringify(deepRatings, null, 2) +
+        "\nFeedback: " + (feedback || "(none)")
+      );
+    });
+    // Block rating if not logged in
+if (!localStorage.getItem("loggedInUser")) {
+  alert("You must log in to rate the Prime Minister.");
+  window.location.href = "login.html";
+}
+
+  </script>
+
+</body>
+</html>

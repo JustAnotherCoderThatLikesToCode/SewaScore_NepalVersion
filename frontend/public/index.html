@@ -1,0 +1,1199 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SewaScore: A Nepal Service Rating Leaderboard</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+      -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+      background:linear-gradient(180deg,#f3fbff 0%,#eaf6ff 45%,#e6f3ff 100%);
+      color:#071029;overflow-x:hidden;
+    }
+
+    /* ---------- Background root (aurora, fog, dust, orbs) ---------- */
+    .bg-root{position:fixed;inset:0;pointer-events:none;z-index:-20;overflow:hidden}
+    .bg-parallax{position:absolute;inset:0;transition:transform .12s linear}
+
+    .aurora{
+      position:absolute;inset:-30%;mix-blend-mode:screen;filter:blur(36px) saturate(1.45);
+      background:
+        radial-gradient(1100px 520px at 12% 12%, rgba(6,182,212,0.78), transparent 30%),
+        radial-gradient(1200px 540px at 88% 18%, rgba(124,58,237,0.72), transparent 30%),
+        radial-gradient(900px 480px at 50% 82%, rgba(236,72,153,0.48), transparent 30%);
+      animation:auroraShift 16s ease-in-out infinite alternate;
+    }
+    @keyframes auroraShift{0%{transform:translate3d(-3%,-4%,0) scale(1)}100%{transform:translate3d(3%,4%,0) scale(1.05)}}
+
+    .fog-layer{position:absolute;inset:0;z-index:-18}
+    .fog-blob{
+      position:absolute;border-radius:50%;
+      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,0.98), rgba(210,220,230,0.7) 40%, rgba(160,170,190,0.12) 70%, rgba(0,0,0,0) 100%);
+      filter:blur(28px) saturate(1.05);opacity:.12;will-change:transform,opacity;
+    }
+    @keyframes fogMoveA{0%{transform:translate3d(0,0,0) scale(.9);opacity:.06}50%{opacity:.14}100%{transform:translate3d(160px,-420px,0) scale(1.05);opacity:0}}
+    @keyframes fogMoveB{0%{transform:translate3d(0,0,0) scale(1);opacity:.08}50%{opacity:.16}100%{transform:translate3d(-200px,-360px,0) scale(.9);opacity:0}}
+    @keyframes fogMoveC{0%{transform:translate3d(0,0,0) scale(.95);opacity:.05}50%{opacity:.12}100%{transform:translate3d(120px,-480px,0) scale(.85);opacity:0}}
+
+    .dust-layer{position:absolute;inset:0;z-index:-16}
+    .dust{
+      position:absolute;border-radius:50%;background:rgba(120,130,140,0.85);
+      filter:blur(.6px) saturate(.9);will-change:transform,opacity;
+      animation:dustFloat linear infinite;opacity:.85;
+    }
+    .dust.small{width:4px;height:4px;opacity:.6;filter:blur(.4px)}
+    .dust.large{width:10px;height:10px;opacity:.95;filter:blur(1.2px)}
+    @keyframes dustFloat{0%{transform:translate3d(0,0,0) scale(1);opacity:.2}40%{opacity:.7}80%{transform:translate3d(40px,-220px,0) scale(1.05);opacity:.95}100%{transform:translate3d(-80px,-480px,0) scale(.9);opacity:0}}
+
+    .orb-layer{position:absolute;inset:0;z-index:-15}
+    .orb{
+      position:absolute;border-radius:50%;filter:blur(6px) saturate(1.1);
+      will-change:transform,opacity;animation:orbFloat linear infinite;opacity:.9;
+    }
+    @keyframes orbFloat{0%{transform:translate3d(0,0,0) scale(.9);opacity:.6}50%{transform:translate3d(40px,-120px,0) scale(1.15);opacity:1}100%{transform:translate3d(-60px,-260px,0) scale(.85);opacity:0}}
+
+    /* ---------- UI ---------- */
+    nav{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:14px 28px;background:rgba(255,255,255,0.96);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid rgba(14,30,37,0.06);
+      position:sticky;top:0;z-index:40;
+      box-shadow:0 10px 30px rgba(15,23,42,0.08);
+    }
+    .nav-logo{
+      font-weight:900;font-size:1.45rem;
+      background:linear-gradient(90deg,#06b6d4,#7c3aed);
+      -webkit-background-clip:text;color:transparent;
+    }
+    .nav-links{display:flex;gap:16px;color:#0b1220;font-weight:700;font-size:.95rem}
+    .nav-links div{cursor:pointer;position:relative}
+    .nav-links div::after{
+      content:"";position:absolute;left:0;bottom:-4px;height:2px;width:0;
+      background:linear-gradient(90deg,#06b6d4,#7c3aed);
+      transition:width .18s ease;
+    }
+    .nav-links div:hover::after{width:100%}
+
+    .app-wrap{position:relative;z-index:10;min-height:100vh}
+.hero {
+  text-align: center;
+  padding: 80px 20px 40px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(14,30,37,0.06);
+  box-shadow: 0 20px 50px rgba(14,30,37,0.08);
+  animation: heroFade .7s ease-out forwards;
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+@keyframes heroFade {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-title {
+  font-size: 2.4rem;
+  font-weight: 900;
+  margin-bottom: 12px;
+  background: linear-gradient(90deg,#06b6d4,#7c3aed);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  color: #475569;
+  max-width: 700px;
+  margin: 0 auto 26px;
+  line-height: 1.55;
+}
+
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.search-bar {
+  width: min(520px, 100%);
+  padding: 12px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(14,30,37,0.06);
+  background: #fff;
+  font-size: 1rem;
+  box-shadow: 0 4px 14px rgba(14,30,37,0.06);
+}
+
+.cta-btn {
+  padding: 12px 22px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(90deg,#06b6d4,#7c3aed);
+  color: white;
+  font-weight: 800;
+  cursor: pointer;
+  font-size: 1rem;
+  box-shadow: 0 12px 30px rgba(37,99,235,0.25);
+  transition: .2s;
+}
+
+.cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(37,99,235,0.35);
+}
+
+
+    .pm-btn {
+      display: inline-block;
+      padding: 12px 26px;
+      border-radius: 999px;
+      background: linear-gradient(90deg,#06b6d4,#7c3aed);
+      color: white;
+      font-weight: 800;
+      text-decoration: none;
+      font-size: 1rem;
+      box-shadow: 0 12px 30px rgba(37,99,235,0.35);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .pm-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 40px rgba(37,99,235,0.45);
+    }
+
+    /* ---------- RATE THE PM SECTION ---------- */
+    .pm-rate-section {
+      margin: 40px auto 20px;
+      text-align: center;
+      padding: 0 20px;
+    }
+    .pm-card {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 36px 28px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(14,30,37,0.06);
+      box-shadow: 0 20px 50px rgba(14,30,37,0.08);
+      position:relative;
+      overflow:hidden;
+    }
+    .pm-card::before{
+      content:"";position:absolute;inset:-40%;
+      background:radial-gradient(circle at 10% 0%,rgba(56,189,248,0.18),transparent 55%),
+                 radial-gradient(circle at 90% 100%,rgba(129,140,248,0.18),transparent 55%);
+      opacity:.7;z-index:-1;
+    }
+    .pm-card h2 {
+      font-size: 2rem;
+      font-weight: 900;
+      background: linear-gradient(90deg,#06b6d4,#7c3aed);
+      -webkit-background-clip: text;
+      color: transparent;
+      margin-bottom: 8px;
+    }
+    .pm-card p {
+      color: #334155;
+      margin-bottom: 18px;
+      font-size: 1rem;
+    }
+
+    /* ---------- MAP & LOCATOR ---------- */
+    .locator-section{
+      max-width:1200px;margin:22px auto 40px;padding:18px;border-radius:16px;
+      background:rgba(255,255,255,0.96);
+      border:1px solid rgba(14,30,37,0.04);
+      display:grid;grid-template-columns:1.4fr 1fr;gap:16px;
+      box-shadow:0 20px 50px rgba(15,23,42,0.08);
+      animation:locatorIn .7s ease-out .15s forwards;
+      opacity:0;transform:translateY(16px);
+    }
+    @keyframes locatorIn{to{opacity:1;transform:translateY(0)}}
+    @media(max-width:980px){.locator-section{grid-template-columns:1fr}}
+
+    .map-card{
+      border-radius:12px;overflow:hidden;
+      border:1px solid rgba(14,30,37,0.04);
+      background:#eef7ff;min-height:420px;display:flex;flex-direction:column;
+    }
+    #map{flex:1;min-height:420px;height:420px}
+    .map-legend{
+      padding:10px 12px;font-size:.85rem;color:#0b1220;
+      border-top:1px solid rgba(14,30,37,0.04);background:#fff;
+      display:flex;justify-content:space-between;align-items:center;
+    }
+
+    .locator-right{display:flex;flex-direction:column;gap:10px}
+    .field-label{font-size:.82rem;color:#071029;margin-bottom:6px;font-weight:700}
+    .select-input{
+      width:100%;padding:9px 10px;border-radius:10px;
+      border:1px solid rgba(14,30,37,0.06);background:#fff;color:#071029;
+      transition:border-color .15s ease,box-shadow .15s ease,transform .1s ease;
+    }
+    .select-input:focus{
+      outline:none;border-color:#38bdf8;
+      box-shadow:0 0 0 1px rgba(56,189,248,0.4);
+      transform:translateY(-1px);
+    }
+
+    .info-panel{
+      padding:12px;border-radius:10px;background:#fff;
+      border:1px solid rgba(14,30,37,0.04);
+      min-height:220px;max-height:300px;overflow:auto;color:#071029;
+      box-shadow:0 10px 30px rgba(15,23,42,0.04);
+      transition:box-shadow .15s ease,transform .15s ease;
+    }
+    .info-panel:hover{
+      box-shadow:0 16px 40px rgba(15,23,42,0.08);
+      transform:translateY(-1px);
+    }
+    .info-panel h3{margin-bottom:6px;font-size:.95rem}
+    .info-panel p{font-size:.85rem;color:#475569;margin-bottom:6px}
+    .info-panel ul{margin-top:6px}
+    .info-panel li{
+      list-style:none;margin:6px 0;padding:8px;border-radius:8px;
+      background:#f8fbff;border-left:3px solid #06b6d4;cursor:pointer;
+      font-size:.85rem;display:flex;justify-content:space-between;align-items:center;
+      transition:background .15s ease,transform .12s ease,box-shadow .12s ease;
+    }
+    .info-panel li span.label{font-weight:600}
+    .info-panel li span.meta{font-size:.78rem;color:#64748b}
+    .info-panel li:hover{
+      background:#e0f2fe;
+      transform:translateY(-1px);
+      box-shadow:0 8px 20px rgba(37,99,235,0.18);
+    }
+
+    .back-button{
+      padding:9px 12px;border-radius:10px;border:none;
+      background:linear-gradient(90deg,#06b6d4,#7c3aed);
+      color:white;font-weight:800;cursor:pointer;
+      box-shadow:0 10px 26px rgba(37,99,235,0.35);
+      transition:transform .15s ease,box-shadow .15s ease;
+    }
+    .back-button:hover{
+      transform:translateY(-2px);
+      box-shadow:0 14px 34px rgba(37,99,235,0.45);
+    }
+
+    footer{text-align:center;padding:18px;color:#475569;font-size:.85rem;margin-bottom:36px}
+    .office-rating {
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(14,30,37,0.06);
+  box-shadow: 0 10px 30px rgba(15,23,42,0.06);
+  display: none;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .3s ease, transform .3s ease;
+}
+
+.office-rating.show {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.office-stars span {
+  font-size: 32px;
+  cursor: pointer;
+  color: #cbd5e1;
+  transition: .15s;
+  margin-right: 6px;
+}
+
+.office-stars span.active {
+  color: #facc15;
+  transform: scale(1.1);
+}
+
+#officeFeedback {
+  width: 100%;
+  height: 90px;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(14,30,37,0.06);
+  background: #fff;
+  resize: none;
+}
+
+.rate-submit-btn {
+  margin-top: 10px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(90deg,#06b6d4,#7c3aed);
+  color: white;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 12px 30px rgba(37,99,235,0.35);
+  transition: .15s;
+}
+
+.rate-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(37,99,235,0.45);
+}
+.pm-average-section {
+  margin: 20px auto 40px;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.pm-average-card {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 26px 24px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(14,30,37,0.06);
+  box-shadow: 0 20px 50px rgba(14,30,37,0.08);
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+.pm-average-card::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(56,189,248,0.18), transparent 55%),
+    radial-gradient(circle at 90% 100%, rgba(129,140,248,0.18), transparent 55%);
+  opacity: .7;
+  z-index: -1;
+}
+
+.pm-average-photo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  padding: 6px;
+  background: linear-gradient(135deg,#06b6d4,#7c3aed);
+  box-shadow:
+    0 0 20px rgba(6,182,212,0.40),
+    0 0 40px rgba(124,58,237,0.35);
+}
+
+.pm-average-info {
+  text-align: left;
+}
+
+.pm-average-info h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 900;
+  background: linear-gradient(90deg,#06b6d4,#7c3aed);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.pm-average-stars {
+  font-size: 32px;
+  margin: 6px 0;
+  color: #facc15;
+  letter-spacing: 4px;
+}
+
+.pm-average-note {
+  font-size: .85rem;
+  color: #64748b;
+}
+.auth-buttons {
+  margin: 20px auto 10px;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+}
+
+.auth-btn {
+  padding: 12px 26px;
+  border-radius: 999px;
+  border: none;
+  font-weight: 800;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: .2s;
+  box-shadow: 0 12px 30px rgba(37,99,235,0.25);
+}
+
+.signup-btn {
+  background: linear-gradient(90deg,#06b6d4,#7c3aed);
+  color: white;
+}
+
+.login-btn {
+  background: white;
+  color: #334155;
+  border: 1px solid rgba(14,30,37,0.1);
+}
+
+.auth-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(37,99,235,0.35);
+}
+:root{
+  --accent-a:#06b6d4;
+  --accent-b:#7c3aed;
+  --nav-text: rgba(15,23,42,0.88);
+}
+
+/* layout */
+.nav-links{ display:flex; gap:18px; align-items:center; }
+
+/* wrapper */
+.nav-item{ position:relative; }
+
+/* link baseline */
+.nav-link{
+  position:relative;
+  display:inline-block;
+  padding:8px 10px;
+  color:var(--nav-text);
+  text-decoration:none;
+  font-weight:700;
+  border-radius:8px;
+  transition: color .14s ease, transform .12s ease;
+  z-index:2;
+}
+
+/* hover lift */
+.nav-link:hover{ transform: translateY(-2px); color:var(--accent-b); }
+
+/* bar using ::after (no extra DOM) */
+.nav-link::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:6px;
+  transform:translateX(-50%) scaleX(0);
+  width:calc(100% + 28px);
+  height:36px;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--accent-a),var(--accent-b));
+  filter:blur(6px) saturate(1.05);
+  box-shadow:0 10px 30px rgba(124,58,237,0.12), inset 0 -6px 18px rgba(255,255,255,0.06);
+  opacity:0;
+  transition: transform .26s cubic-bezier(.2,.9,.2,1), opacity .18s;
+  z-index:-1;
+  pointer-events:none;
+}
+
+/* show on hover/focus */
+.nav-link:hover::after,
+.nav-link:focus::after{ transform:translateX(-50%) scaleX(1); opacity:1; }
+
+/* active state */
+.nav-link.active{ color:#fff; }
+.nav-link.active::after{ transform:translateX(-50%) scaleX(1); opacity:1; }
+
+/* small screens */
+@media (max-width:420px){ .nav-link::after{ display:none; } }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- BACKGROUND -->
+  <div class="bg-root">
+    <div class="bg-parallax" id="bgParallax">
+      <div class="aurora" id="aurora"></div>
+      <div class="fog-layer" id="fogLayer"></div>
+      <div class="dust-layer" id="dustLayer"></div>
+      <div class="orb-layer" id="orbLayer"></div>
+    </div>
+  </div>
+
+  <div class="app-wrap">
+    <nav>
+      <div class="nav-logo">SewaScore (सेवा अंक)</div>
+<div class="nav-links">
+  <div class="nav-item"><a class="nav-link" href="index.html">Home</a></div>
+  <div class="nav-item"><a class="nav-link" href="branches.html">Branches</a></div>
+  <div class="nav-item"><a class="nav-link" href="insights.html">Insights</a></div>
+  <div class="nav-item"><a class="nav-link" href="about.html">About</a></div>
+</div>
+    </nav>
+
+<section class="hero">
+  <div class="hero-inner">
+
+    <h1 class="hero-title">Nepal’s Service Rating Leaderboard</h1>
+
+    <p class="hero-subtitle">
+    Rate services. See the truth. Expose corruption. Empower NEPAL.
+    </p>
+
+    <div class="hero-actions">
+      <input id="searchBar" class="search-bar" placeholder="Search province, district, or office…" />
+      <button id="cta" class="cta-btn">Explore Map</button>
+    </div>
+
+  </div>
+</section>
+<section class="auth-buttons">
+  <button class="auth-btn signup-btn" onclick="window.location.href='signup.html'">Sign Up</button>
+  <button class="auth-btn login-btn" onclick="window.location.href='login.html'">Log In</button>
+</section>
+
+
+   <!-- RATE THE PRIME MINISTER SECTION -->
+<section class="pm-average-section">
+  <div class="pm-average-card">
+    <img src="balen_shah.avif" class="pm-average-photo" alt="Prime Minister photo">
+
+    <div class="pm-average-info">
+      <h3>Current Rating of the PM</h3>
+
+      <!-- 3.5 star display -->
+      <div class="pm-average-stars" aria-label="3.5 out of 5 stars" role="img">
+        <span class="stars" data-score="3.5" aria-hidden="true">★★★★★</span>
+        <span class="sr-only">3.5 out of 5</span>
+      </div>
+
+      <p class="pm-average-note">100K+ citizens have rated</p>
+    </div>
+  </div>
+</section>
+
+<style>
+/* star baseline: empty (light) and filled (accent) overlay */
+.pm-average-stars { font-size: 1.6rem; line-height: 1; position: relative; display: inline-block; color: #e6e6e6; /* empty star color */ }
+.pm-average-stars .stars { position: relative; display: inline-block; color: #e6e6e6; }
+
+/* filled overlay using ::after with width = (score/5 * 100)% */
+.pm-average-stars .stars::after{
+  content: '★★★★★';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #f6b93b; /* filled star color (gold) */
+  overflow: hidden;
+  width: 0%;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* set width based on data-score attribute (3.5/5 = 70%) */
+.pm-average-stars .stars[data-score="0"]::after{ width: 0%; }
+.pm-average-stars .stars[data-score="0.5"]::after{ width: 10%; }
+.pm-average-stars .stars[data-score="1"]::after{ width: 20%; }
+.pm-average-stars .stars[data-score="1.5"]::after{ width: 30%; }
+.pm-average-stars .stars[data-score="2"]::after{ width: 40%; }
+.pm-average-stars .stars[data-score="2.5"]::after{ width: 50%; }
+.pm-average-stars .stars[data-score="3"]::after{ width: 60%; }
+.pm-average-stars .stars[data-score="3.5"]::after{ width: 70%; }
+.pm-average-stars .stars[data-score="4"]::after{ width: 80%; }
+.pm-average-stars .stars[data-score="4.5"]::after{ width: 90%; }
+.pm-average-stars .stars[data-score="5"]::after{ width: 100%; }
+
+/* visually-hidden for screen readers */
+.sr-only{
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap;
+  border:0;
+}
+</style>
+
+
+<!-- ⭐ ORIGINAL RATE THE PM CARD (UNCHANGED) -->
+<section class="pm-rate-section">
+  <div class="pm-card">
+    <h2>Rate the Prime Minister</h2>
+    <p>Share your feedback and rate the current Prime Minister’s performance.</p>
+    <a href="pm.html" class="pm-btn">Rate Now</a>
+  </div>
+</section>
+
+
+    <!-- MAP + LOCATOR -->
+    <section class="locator-section" id="locatorSection">
+      <div class="map-card">
+        <div id="map"></div>
+        <div class="map-legend">
+          <div>Hover provinces · Click to zoom & load districts</div>
+          <div style="padding:4px 8px;border-radius:999px;background:#e6f0ff;color:#1d4ed8;font-weight:700">Provinces & Districts</div>
+        </div>
+      </div>
+
+      <div class="locator-right">
+        <div class="office-rating" id="officeRatingBox">
+  <h3>⭐ Rate This Office</h3>
+
+  <div class="office-stars" id="officeStars">
+    <span data-val="1">★</span>
+    <span data-val="2">★</span>
+    <span data-val="3">★</span>
+    <span data-val="4">★</span>
+    <span data-val="5">★</span>
+  </div>
+
+  <textarea id="officeFeedback" placeholder="Write your feedback..."></textarea>
+
+  <button class="rate-submit-btn" id="officeSubmitBtn">Submit Rating</button>
+</div>
+
+        <div>
+          <div class="field-label">Province</div>
+          <select id="provinceSelect" class="select-input">
+            <option value="">Any province</option>
+          </select>
+        </div>
+
+        <div>
+          <div class="field-label">District</div>
+          <select id="districtSelect" class="select-input">
+            <option value="">Any district</option>
+          </select>
+        </div>
+
+        <div>
+          <div class="field-label">Municipality</div>
+          <select id="municipalitySelect" class="select-input">
+            <option value="">Any municipality</option>
+          </select>
+        </div>
+
+        <div>
+          <div class="field-label">Office</div>
+          <select id="officeSelect" class="select-input">
+            <option value="">Select an office</option>
+          </select>
+        </div>
+
+        <div class="info-panel" id="panel-content">
+          <h3>📍 Information</h3>
+          <p>Select a province or click on the map to see its districts and key offices.</p>
+        </div>
+
+        <button id="resetViewBtn" class="back-button">Reset Map View</button>
+      </div>
+    </section>
+
+    <footer>© 2026 SewaScore — Built for citizens</footer>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script type="module">
+  // Approximate center coordinates for provinces
+const PROVINCE_COORDS = {
+  "Koshi Province": [27.1, 87.3],
+  "Madhesh Province": [26.7, 85.9],
+  "Bagmati Province": [27.7, 85.3],
+  "Gandaki Province": [28.3, 84.3],
+  "Lumbini Province": [27.6, 83.3],
+  "Karnali Province": [29.0, 82.5],
+  "Sudurpashchim Province": [29.3, 80.9]
+};
+
+// Approximate center coordinates for districts
+const DISTRICT_COORDS = {
+  "Kathmandu": [27.7172, 85.3240],
+  "Lalitpur": [27.6588, 85.3247],
+  "Bhaktapur": [27.6710, 85.4298],
+  "Kaski": [28.2096, 83.9856],
+  "Jhapa": [26.5455, 87.8942],
+  "Morang": [26.6760, 87.2718],
+  "Chitwan": [27.5291, 84.3542],
+  "Rupandehi": [27.5333, 83.3833],
+  "Banke": [28.0500, 81.6167],
+  "Kailali": [28.6833, 80.6167],
+  // Add more districts as needed
+};
+
+  const rand=(a,b)=>a+Math.random()*(b-a);
+  const $=s=>document.querySelector(s);
+
+  /* ---------- Fog ---------- */
+  (function fog(){
+    const root=$('#fogLayer');
+    for(let i=0;i<14;i++){
+      const b=document.createElement('div');
+      b.className='fog-blob';
+      const w=Math.round(rand(260,760));
+      const h=Math.round(w*rand(.45,.85));
+      b.style.width=w+'px';b.style.height=h+'px';
+      b.style.left=(rand(-.12,1.12)*100)+'%';
+      b.style.top=(rand(.6,1.05)*100)+'%';
+      const anim=i%3===0?'fogMoveA':i%3===1?'fogMoveB':'fogMoveC';
+      b.style.animation=`${anim} ${Math.round(rand(28,72))}s linear infinite`;
+      root.appendChild(b);
+    }
+  })();
+
+  /* ---------- Dust ---------- */
+  (function dust(){
+    const root=$('#dustLayer');
+    for(let i=0;i<140;i++){
+      const d=document.createElement('div');
+      d.className='dust';
+      if(Math.random()<.12)d.classList.add('large');
+      else if(Math.random()<.35)d.classList.add('small');
+      d.style.left=(Math.random()*100)+'%';
+      d.style.top=(rand(.6,1.05)*100)+'%';
+      d.style.animationDuration=rand(8,18)+'s';
+      root.appendChild(d);
+    }
+  })();
+
+  /* ---------- Orbs ---------- */
+  (function orbs(){
+    const root=$('#orbLayer');
+    for(let i=0;i<26;i++){
+      const o=document.createElement('div');
+      o.className='orb';
+      const size=Math.round(rand(28,88));
+      o.style.width=size+'px';o.style.height=size+'px';
+      o.style.left=(Math.random()*100)+'%';
+      o.style.top=(rand(.6,1.05)*100)+'%';
+      o.style.animationDuration=rand(6,14)+'s';
+      const hue=Math.round(rand(180,320));
+      o.style.background=`radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), hsla(${hue},85%,80%,.95) 35%, hsla(${hue},85%,70%,.28) 70%, transparent)`;
+      root.appendChild(o);
+    }
+  })();
+
+  /* ---------- Parallax ---------- */
+  (function parallax(){
+    const aur=$('#aurora'),fog=$('#fogLayer'),dust=$('#dustLayer'),orbs=$('#orbLayer');
+    function move(e){
+      const x=((e.clientX||innerWidth/2)/innerWidth)-.5;
+      const y=((e.clientY||innerHeight/2)/innerHeight)-.5;
+      aur.style.transform=`translate3d(${x*6}%,${y*4}%,0)`;
+      fog.style.transform=`translate3d(${x*10}%,${y*6}%,0)`;
+      dust.style.transform=`translate3d(${x*14}%,${y*10}%,0)`;
+      orbs.style.transform=`translate3d(${x*18}%,${y*12}%,0)`;
+    }
+    window.addEventListener('mousemove',move);
+  })();
+
+  /* ---------- Nepal Data (Medium dataset) ---------- */
+  const NEPAL_DATA = {
+    "Koshi Province": {
+      districts: [
+        "Bhojpur","Dhankuta","Ilam","Jhapa","Khotang","Morang","Okhaldhunga",
+        "Panchthar","Sankhuwasabha","Solukhumbu","Sunsari","Taplejung","Terhathum","Udayapur"
+      ]
+    },
+    "Madhesh Province": {
+      districts: [
+        "Bara","Dhanusha","Mahottari","Parsa","Rautahat","Saptari","Sarlahi","Siraha"
+      ]
+    },
+    "Bagmati Province": {
+      districts: [
+        "Bhaktapur","Chitwan","Dhading","Dolakha","Kathmandu","Kavrepalanchok",
+        "Lalitpur","Makwanpur","Nuwakot","Ramechhap","Rasuwa","Sindhuli","Sindhupalchok"
+      ]
+    },
+    "Gandaki Province": {
+      districts: [
+        "Baglung","Gorkha","Kaski","Lamjung","Manang","Mustang","Myagdi",
+        "Nawalpur","Parbat","Syangja","Tanahun"
+      ]
+    },
+    "Lumbini Province": {
+      districts: [
+        "Arghakhanchi","Banke","Bardiya","Dang","Gulmi","Kapilvastu",
+        "Parasi","Palpa","Pyuthan","Rolpa","Rukum East","Rupandehi"
+      ]
+    },
+    "Karnali Province": {
+      districts: [
+        "Dailekh","Dolpa","Humla","Jajarkot","Jumla","Kalikot","Mugu",
+        "Rukum West","Salyan","Surkhet"
+      ]
+    },
+    "Sudurpashchim Province": {
+      districts: [
+        "Achham","Baitadi","Bajhang","Bajura","Dadeldhura","Darchula",
+        "Doti","Kailali","Kanchanpur"
+      ]
+    }
+  };
+
+  const MAIN_OFFICES = [
+    "District Administration Office",
+    "District Court",
+    "Land Revenue Office",
+    "Survey Office",
+    "Municipality / Rural Municipality Office",
+    "Transport Management Office",
+    "Police Office (District HQ)"
+  ];
+
+  /* ---------- DOM refs ---------- */
+  const provinceSelect = document.getElementById('provinceSelect');
+  const districtSelect = document.getElementById('districtSelect');
+  const municipalitySelect = document.getElementById('municipalitySelect');
+  const officeSelect = document.getElementById('officeSelect');
+  const panel = document.getElementById('panel-content');
+  const resetBtn = document.getElementById('resetViewBtn');
+  const ctaBtn = document.getElementById('cta');
+  const locatorSection = document.getElementById('locatorSection');
+  const searchBar = document.getElementById('searchBar');
+
+  function clearSelect(select, placeholder){
+    select.innerHTML='';
+    const opt=document.createElement('option');
+    opt.value='';
+    opt.textContent=placeholder;
+    select.appendChild(opt);
+  }
+
+  function populateProvinces(){
+    Object.keys(NEPAL_DATA).forEach(name=>{
+      const opt=document.createElement('option');
+      opt.value=name;
+      opt.textContent=name;
+      provinceSelect.appendChild(opt);
+    });
+  }
+
+  function populateDistricts(provinceName){
+    clearSelect(districtSelect,'Any district');
+    clearSelect(municipalitySelect,'Any municipality');
+    clearSelect(officeSelect,'Select an office');
+    if(!provinceName || !NEPAL_DATA[provinceName]) return;
+    NEPAL_DATA[provinceName].districts.forEach(d=>{
+      const opt=document.createElement('option');
+      opt.value=d;
+      opt.textContent=d;
+      districtSelect.appendChild(opt);
+    });
+  }
+
+  function populateMunicipalities(provinceName,districtName){
+    clearSelect(municipalitySelect,'Any municipality');
+    clearSelect(officeSelect,'Select an office');
+    if(!provinceName || !districtName) return;
+    const opt=document.createElement('option');
+    opt.value='All municipalities';
+    opt.textContent='All municipalities in '+districtName;
+    municipalitySelect.appendChild(opt);
+  }
+
+  function populateOffices(){
+    clearSelect(officeSelect,'Select an office');
+    MAIN_OFFICES.forEach(o=>{
+      const opt=document.createElement('option');
+      opt.value=o;
+      opt.textContent=o;
+      officeSelect.appendChild(opt);
+    });
+  }
+
+  function updateInfoPanelFromSelection(){
+    const p=provinceSelect.value;
+    const d=districtSelect.value;
+    const m=municipalitySelect.value;
+    const o=officeSelect.value;
+
+    panel.innerHTML='';
+    const h=document.createElement('h3');
+    h.textContent='📍 Selection Summary';
+    const pEl=document.createElement('p');
+    pEl.textContent='You can refine by province, district, municipality, and office.';
+
+    const ul=document.createElement('ul');
+
+    const addRow=(label,value)=>{
+      const li=document.createElement('li');
+      const spanLabel=document.createElement('span');
+      spanLabel.className='label';
+      spanLabel.textContent=label;
+      const spanMeta=document.createElement('span');
+      spanMeta.className='meta';
+      spanMeta.textContent=value || 'Any';
+      li.appendChild(spanLabel);
+      li.appendChild(spanMeta);
+      ul.appendChild(li);
+    };
+
+    addRow('Province',p||'Any');
+    addRow('District',d||'Any');
+    addRow('Municipality',m||'Any');
+    addRow('Office',o||'Any');
+
+    panel.appendChild(h);
+    panel.appendChild(pEl);
+    panel.appendChild(ul);
+  }
+
+  provinceSelect.addEventListener('change',()=>{
+    const p=provinceSelect.value;
+    populateDistricts(p);
+    updateInfoPanelFromSelection();
+    if(p && map && provinceLayers[p]){
+      map.fitBounds(provinceLayers[p].getBounds(),{padding:[20,20]});
+    }
+  });
+
+  districtSelect.addEventListener('change',()=>{
+    const p=provinceSelect.value;
+    const d=districtSelect.value;
+    populateMunicipalities(p,d);
+    updateInfoPanelFromSelection();
+  });
+
+  municipalitySelect.addEventListener('change',()=>{
+    if(municipalitySelect.value) populateOffices();
+    updateInfoPanelFromSelection();
+  });
+
+  officeSelect.addEventListener('change',updateInfoPanelFromSelection);
+
+  /* ---------- Map ---------- */
+  let map;
+  const provinceLayers = {};
+  let nepalGeojson = null;
+
+  function initMap(){
+    if(!nepalGeojson){
+      console.warn('GeoJSON not loaded; map will be basic.');
+      map = L.map('map',{zoomControl:true}).setView([28.2,84.0],7);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+        maxZoom:18,
+        attribution:'&copy; OpenStreetMap'
+      }).addTo(map);
+      return;
+    }
+
+    map = L.map('map',{zoomControl:false}).setView([28.2,84.0],7);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+      maxZoom:18,
+      attribution:'&copy; OpenStreetMap'
+    }).addTo(map);
+
+    const baseStyle = {
+      color:'#1d4ed8',
+      weight:1,
+      fillColor:'#bfdbfe',
+      fillOpacity:0.35
+    };
+
+    function style(feature){
+      return baseStyle;
+    }
+
+    function highlightFeature(e){
+      const layer=e.target;
+      layer.setStyle({
+        weight:2,
+        color:'#0ea5e9',
+        fillColor:'#60a5fa',
+        fillOpacity:0.5
+      });
+      if(!L.Browser.ie && !L.Browser.opera && !L.Browser.edge){
+        layer.bringToFront();
+      }
+    }
+
+    function resetHighlight(e){
+      geojson.resetStyle(e.target);
+    }
+
+    function zoomToFeature(e){
+      const layer=e.target;
+      map.fitBounds(layer.getBounds(),{padding:[20,20]});
+      const provName = layer.feature.properties && (layer.feature.properties.PROVINCE || layer.feature.properties.Province || layer.feature.properties.name);
+      if(provName && NEPAL_DATA[provName]){
+        provinceSelect.value=provName;
+        populateDistricts(provName);
+        updateInfoPanelFromSelection();
+      }
+    }
+
+    function onEachFeature(feature,layer){
+      const provName = feature.properties && (feature.properties.PROVINCE || feature.properties.Province || feature.properties.name);
+      if(provName){
+        provinceLayers[provName]=layer;
+      }
+      layer.on({
+        mouseover:highlightFeature,
+        mouseout:resetHighlight,
+        click:zoomToFeature
+      });
+    }
+
+    const geojson = L.geoJSON(nepalGeojson,{style,onEachFeature}).addTo(map);
+    L.control.zoom({position:'bottomright'}).addTo(map);
+  }
+
+  /* ---------- CTA scroll ---------- */
+  ctaBtn.addEventListener('click',()=>{
+    locatorSection.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+
+  /* ---------- Simple search ---------- */
+  searchBar.addEventListener('input',()=>{
+    const q=searchBar.value.trim().toLowerCase();
+    if(!q) return;
+    const prov = Object.keys(NEPAL_DATA).find(p=>p.toLowerCase().includes(q));
+    if(prov){
+      provinceSelect.value=prov;
+      populateDistricts(prov);
+      updateInfoPanelFromSelection();
+      if(map && provinceLayers[prov]){
+        map.fitBounds(provinceLayers[prov].getBounds(),{padding:[20,20]});
+      }
+      return;
+    }
+    for(const [provName,data] of Object.entries(NEPAL_DATA)){
+      const dist = data.districts.find(d=>d.toLowerCase().includes(q));
+      if(dist){
+        provinceSelect.value=provName;
+        populateDistricts(provName);
+        districtSelect.value=dist;
+        populateMunicipalities(provName,dist);
+        updateInfoPanelFromSelection();
+        if(map && provinceLayers[provName]){
+          map.fitBounds(provinceLayers[provName].getBounds(),{padding:[20,20]});
+        }
+        break;
+      }
+    }
+  });
+
+  /* ---------- Reset button ---------- */
+  resetBtn.addEventListener('click',()=>{
+    provinceSelect.value='';
+    clearSelect(districtSelect,'Any district');
+    clearSelect(municipalitySelect,'Any municipality');
+    clearSelect(officeSelect,'Select an office');
+    panel.innerHTML='<h3>📍 Information</h3><p>Click a province on the map to list its districts here.</p>';
+    if(map){
+      map.setView([28.2,84.0],7);
+    }
+  });
+
+  /* ---------- Init: dropdowns always, map if import works ---------- */
+  populateProvinces();
+  updateInfoPanelFromSelection();
+
+  (async () => {
+    try {
+      const mod = await import('https://cdn.skypack.dev/nepal-geojson');
+      nepalGeojson = mod.default || mod;
+    } catch (e) {
+      console.error('Failed to load nepal-geojson, using basic map only.', e);
+    } finally {
+      initMap();
+    }
+  })();
+  let officeRating = 0;
+
+function checkIfReadyToRate() {
+  const p = provinceSelect.value;
+  const d = districtSelect.value;
+  const m = municipalitySelect.value;
+  const o = officeSelect.value;
+
+  const box = document.getElementById("officeRatingBox");
+
+  if (p && d && m && o) {
+    box.classList.add("show");
+  } else {
+    box.classList.remove("show");
+  }
+}
+function zoomToProvince(province) {
+  if (PROVINCE_COORDS[province]) {
+    map.setView(PROVINCE_COORDS[province], 8);
+  }
+}
+
+function zoomToDistrict(district) {
+  if (DISTRICT_COORDS[district]) {
+    map.setView(DISTRICT_COORDS[district], 10);
+  }
+}
+
+provinceSelect.addEventListener("change", () => {
+  populateDistricts(provinceSelect.value);
+  zoomToProvince(provinceSelect.value);
+  checkReady();
+});
+
+districtSelect.addEventListener("change", () => {
+  populateMunicipalities(provinceSelect.value, districtSelect.value);
+  zoomToDistrict(districtSelect.value);
+  checkReady();
+});
+
+municipalitySelect.addEventListener("change", checkIfReadyToRate);
+officeSelect.addEventListener("change", checkIfReadyToRate);
+
+// Stars
+document.querySelectorAll("#officeStars span").forEach(star => {
+  star.addEventListener("click", () => {
+    officeRating = parseInt(star.dataset.val);
+
+    document.querySelectorAll("#officeStars span").forEach((s, i) => {
+      s.classList.toggle("active", i < officeRating);
+    });
+  });
+});
+
+// Submit
+document.getElementById("officeSubmitBtn").addEventListener("click", () => {
+  const feedback = document.getElementById("officeFeedback").value.trim();
+
+  alert(
+    "Office Rating Submitted:\n" +
+    "Rating: " + officeRating + "\n" +
+    "Feedback: " + (feedback || "(none)")
+  );
+});
+(function(){
+  const links = document.querySelectorAll('.nav-link');
+  if(!links.length) return;
+  const path = location.pathname.split('/').pop() || 'index.html';
+  links.forEach(a => {
+    const href = a.getAttribute('href') || '';
+    if(href === path || (href === 'index.html' && (path === '' || path === 'index.html'))){
+      a.classList.add('active');
+    } else a.classList.remove('active');
+  });
+})();
+</script>
+</body>
+</html>
