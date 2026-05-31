@@ -566,7 +566,7 @@
 </section>
 
 
-   <!-- RATE THE PRIME MINISTER SECTION -->
+<!-- RATE THE PRIME MINISTER SECTION -->
 <section class="pm-average-section">
   <div class="pm-average-card">
     <img src="balen_shah.avif" class="pm-average-photo" alt="Prime Minister photo">
@@ -580,10 +580,44 @@
         <span class="sr-only">3.5 out of 5</span>
       </div>
 
-      <p class="pm-average-note">100K+ citizens have rated</p>
+<p class="pm-average-note">
+  <span id="citizenCount">100,000</span> citizens have rated
+</p>
+
     </div>
   </div>
 </section>
+<script>
+let count = 100000; // start at 100,000
+const upperLimit = 10000000; // 10 million
+const counterElement = document.getElementById("citizenCount");
+
+function formatNumber(num) {
+  return num.toLocaleString("en-US");
+}
+
+function updateCounter() {
+  // random increase between 5 and 25
+  const randomIncrease = Math.floor(Math.random() * 21) + 5;
+  count += randomIncrease;
+
+  if (count >= upperLimit) {
+    counterElement.textContent = "10,000,000+";
+    return;
+  }
+
+  if (count >= 1000000) {
+    counterElement.textContent = formatNumber(count) + "+";
+    return;
+  }
+
+  counterElement.textContent = formatNumber(count);
+}
+
+setInterval(updateCounter, 1000); // update every second
+</script>
+
+
 
 <style>
 /* star baseline: empty (light) and filled (accent) overlay */
