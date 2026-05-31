@@ -744,8 +744,12 @@ setInterval(updateCounter, 1000); // update every second
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script type="module">
+  import mod from './geo.js';
+  window.nepalGeojson = mod.default || mod;
+</script>
+
+<script>
   // Approximate center coordinates for provinces
 const PROVINCE_COORDS = {
   "Koshi Province": [27.1, 87.3],
@@ -1142,17 +1146,16 @@ const DISTRICT_COORDS = {
   /* ---------- Init: dropdowns always, map if import works ---------- */
   populateProvinces();
   updateInfoPanelFromSelection();
+(async () => {
+  try {
+    nepalGeojson = window.nepalGeojson;
+  } catch (e) {
+    console.error('Failed to load nepal-geojson, using basic map only.', e);
+  } finally {
+    initMap();
+  }
+})();
 
-  (async () => {
-    try {
-      const mod = await import('https://cdn.skypack.dev/nepal-geojson');
-      nepalGeojson = mod.default || mod;
-    } catch (e) {
-      console.error('Failed to load nepal-geojson, using basic map only.', e);
-    } finally {
-      initMap();
-    }
-  })();
   let officeRating = 0;
 
 function checkIfReadyToRate() {
