@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Coming Soon — SewaScore</title>
+<style>
+  :root{
+    --accent-a:#06b6d4;
+    --accent-b:#7c3aed;
+  }
+
+  html,body{
+    margin:0;
+    height:100%;
+    overflow:hidden;
+    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    background:transparent !important;
+  }
+
+  /* Background root + layers */
+  .bg-root{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:-1;
+    overflow:visible;
+  }
+
+  .bg-parallax{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    overflow:visible;
+  }
+
+  .aurora{
+    position:absolute;
+    inset:-30%;
+    mix-blend-mode:screen;
+    filter:blur(36px) saturate(1.2);
+    background:
+      radial-gradient(1100px 520px at 12% 12%, rgba(6,182,212,0.72), transparent 30%),
+      radial-gradient(1200px 540px at 88% 18%, rgba(124,58,237,0.66), transparent 30%),
+      radial-gradient(900px 480px at 50% 82%, rgba(236,72,153,0.36), transparent 30%);
+    animation:auroraShift 18s ease-in-out infinite alternate;
+    opacity:0.95;
+  }
+
+  @keyframes auroraShift{
+    0%{transform:translate3d(-3%,-4%,0)}
+    100%{transform:translate3d(3%,4%,0)}
+  }
+
+  .fog-layer, .dust-layer, .orb-layer{
+    position:absolute;
+    inset:0;
+    overflow:visible;
+  }
+
+  /* Center text */
+  .center-wrap{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    z-index:10;
+  }
+
+  .coming-text{
+    font-size:4rem;
+    font-weight:900;
+    background:linear-gradient(90deg,var(--accent-a),var(--accent-b));
+    -webkit-background-clip:text;
+    color:transparent;
+    text-shadow:0 0 40px rgba(0,0,0,0.15);
+    letter-spacing:-1px;
+    user-select:none;
+  }
+
+  @media(max-width:600px){
+    .coming-text{
+      font-size:2.6rem;
+    }
+  }
+  /* Fog blob shapes */
+.fog-blob{
+  position:absolute;
+  border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,
+    rgba(255,255,255,0.98),
+    rgba(210,220,230,0.7) 40%,
+    rgba(160,170,190,0.12) 70%,
+    transparent 100%);
+  filter:blur(28px) saturate(1.05);
+  opacity:.12;
+  will-change:transform,opacity;
+}
+
+/* Dust particles */
+.dust{
+  position:absolute;
+  border-radius:50%;
+  background:rgba(120,130,140,0.85);
+  filter:blur(.6px) saturate(.9);
+  opacity:.85;
+  will-change:transform,opacity;
+}
+
+.dust.small{
+  width:4px;
+  height:4px;
+  opacity:.6;
+  filter:blur(.4px);
+}
+
+.dust.large{
+  width:10px;
+  height:10px;
+  opacity:.95;
+  filter:blur(1.2px);
+}
+
+/* Orbs */
+.orb{
+  position:absolute;
+  border-radius:50%;
+  filter:blur(6px) saturate(1.1);
+  mix-blend-mode:screen;
+  box-shadow:0 8px 40px rgba(0,0,0,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+  will-change:transform,opacity;
+}
+.back-btn{
+  position:fixed;
+  top:24px;
+  left:24px;
+  z-index:20;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:8px 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.92);
+  border:1px solid rgba(15,23,42,0.08);
+  box-shadow:0 10px 30px rgba(15,23,42,0.06);
+  font-size:0.9rem;
+  font-weight:700;
+  color:#0f172a;
+  text-decoration:none;
+}
+
+.back-btn:hover{
+  box-shadow:0 16px 40px rgba(15,23,42,0.12);
+  transform:translateY(-1px);
+}
+
+/* BIGGER, CLEANER, LESS OPAQUE CARD */
+.coming-card{
+  position:relative;
+  width:900px;
+  max-width:92%;
+  padding:90px 60px;
+  background:rgba(255,255,255,0.55); /* lower opacity */
+  border-radius:28px;
+  backdrop-filter:blur(22px) saturate(1.2);
+  border:1px solid rgba(255,255,255,0.45);
+  box-shadow:0 50px 140px rgba(15,23,42,0.12);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  z-index:20;
+  margin:auto;
+  top:50%;
+  transform:translateY(-50%);
+}
+
+/* Back button inside the card */
+.back-inside{
+  position:absolute;
+  top:26px;
+  left:26px;
+  font-size:1rem;
+  font-weight:700;
+  color:#0f172a;
+  text-decoration:none;
+  padding:10px 16px;
+  border-radius:12px;
+  background:rgba(255,255,255,0.75);
+  border:1px solid rgba(15,23,42,0.08);
+  box-shadow:0 10px 30px rgba(15,23,42,0.06);
+  transition:0.15s ease;
+}
+
+.back-inside:hover{
+  background:rgba(255,255,255,0.9);
+  transform:translateY(-2px);
+}
+
+/* Bigger COMING SOON text */
+.coming-title{
+  font-size:4.2rem;
+  font-weight:900;
+  background:linear-gradient(90deg,var(--accent-a),var(--accent-b));
+  -webkit-background-clip:text;
+  color:transparent;
+  text-align:center;
+  letter-spacing:-1px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- BACKGROUND -->
+<div class="bg-root">
+  <div class="bg-parallax" id="bgParallax">
+    <div class="aurora" id="aurora"></div>
+    <div class="fog-layer" id="fogLayer"></div>
+    <div class="dust-layer" id="dustLayer"></div>
+    <div class="orb-layer" id="orbLayer"></div>
+  </div>
+</div>
+
+<div class="coming-card">
+  <a href="index.html" class="back-inside">← Back</a>
+  <div class="coming-title">COMING SOON</div>
+</div>
+
+<!-- YOUR BACKGROUND JS EXACTLY AS IS -->
+<script>
+/* ---------- Simple background generators (fog, dust, orbs) and parallax (kept) ---------- */
+function rand(min,max){ return Math.random()*(max-min)+min; }
+
+/* Fog blobs */
+(function fog(){
+  const root=document.getElementById('fogLayer');
+  if(!root) return;
+  root.innerHTML='';
+  for(let i=0;i<12;i++){
+    const b=document.createElement('div');
+    b.className='fog-blob';
+    const w=Math.round(rand(220,760));
+    const h=Math.round(w*rand(.45,.85));
+    b.style.width=w+'px';
+    b.style.height=h+'px';
+    b.style.left=(rand(-.12,1.12)*100)+'%';
+    b.style.top=(rand(-.05,0.8)*100)+'%';
+    b.style.opacity = rand(0.04,0.16).toFixed(2);
+    root.appendChild(b);
+  }
+})();
+
+/* Dust */
+(function dust(){
+  const root=document.getElementById('dustLayer');
+  if(!root) return;
+  root.innerHTML='';
+  for(let i=0;i<90;i++){
+    const d=document.createElement('div');
+    d.className='dust';
+    if(Math.random()<.12) d.classList.add('large');
+    else if(Math.random()<.35) d.classList.add('small');
+    d.style.left=(Math.random()*100)+'%';
+    d.style.top=(rand(0,1)*100)+'%';
+    d.style.opacity = rand(0.04,0.18).toFixed(2);
+    root.appendChild(d);
+  }
+})();
+
+/* Orbs */
+(function orbs(){
+  const root=document.getElementById('orbLayer');
+  if(!root) return;
+  root.innerHTML='';
+  for(let i=0;i<22;i++){
+    const o=document.createElement('div');
+    o.className='orb';
+    const size=Math.round(rand(28,110));
+    o.style.width=size+'px';
+    o.style.height=size+'px';
+    o.style.left=(Math.random()*100)+'%';
+    o.style.top=(rand(0,1)*100)+'%';
+    o.style.opacity = rand(0.5,1).toFixed(2);
+    const hue=Math.round(rand(160,340));
+    o.style.background=`radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), hsla(${hue},85%,80%,.95) 35%, hsla(${hue},85%,70%,.28) 70%, transparent)`;
+    root.appendChild(o);
+  }
+})();
+
+/* Parallax */
+(function parallax(){
+  const aur = document.getElementById('aurora'),
+        fog = document.getElementById('fogLayer'),
+        dust = document.getElementById('dustLayer'),
+        orbs = document.getElementById('orbLayer'),
+        bgPar = document.getElementById('bgParallax');
+
+  if (!bgPar) return;
+
+  let targetX = 0, targetY = 0;
+  let currentX = 0, currentY = 0;
+  let t = 0;
+
+  function lerp(a,b,n){ return (1-n)*a + n*b; }
+
+  window.addEventListener('mousemove', e=>{
+    targetX = (e.clientX / innerWidth) - 0.5;
+    targetY = (e.clientY / innerHeight) - 0.5;
+  });
+
+  function loop(){
+    currentX = lerp(currentX, targetX, 0.12);
+    currentY = lerp(currentY, targetY, 0.12);
+
+    t += 0.006;
+    const idleX = Math.sin(t * 0.9) * 0.02;
+    const idleY = Math.cos(t * 0.7) * 0.02;
+
+    const px = currentX + idleX;
+    const py = currentY + idleY;
+
+    aur.style.transform = `translate3d(${px * 6}%, ${py * 4}%, 0)`;
+    fog.style.transform = `translate3d(${px * 10}%, ${py * 6}%, 0)`;
+    dust.style.transform = `translate3d(${px * 14}%, ${py * 10}%, 0)`;
+    orbs.style.transform = `translate3d(${px * 18}%, ${py * 12}%, 0)`;
+    bgPar.style.transform = `rotateX(${py * 1.2}deg) rotateY(${px * 1.2}deg)`;
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+</script>
+
+</body>
+</html>
