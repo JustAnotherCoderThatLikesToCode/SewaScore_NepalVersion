@@ -544,6 +544,14 @@ if (!localStorage.getItem("loggedInUser")) {
   alert("You must log in to rate the Prime Minister.");
   window.location.href = "login.html";
 }
+fetch("checkSession.php")
+  .then(res => res.json())
+  .then(data => {
+    if (!data.loggedIn) {
+      alert("You must log in to rate the Prime Minister.");
+      window.location.href = "login.html";
+    }
+  });
 
   </script>
 

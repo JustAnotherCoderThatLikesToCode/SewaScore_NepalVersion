@@ -1,10 +1,8 @@
 <?php
-// connection.php
-
 $host   = "localhost";
-$dbname = "u699891582_login";   // your Hostinger DB name
-$dbuser = "u699891582_login";   // your Hostinger DB username
-$dbpass = "Q8!vR3#tM7@pL2$zN9xK6%hF4";  // your Hostinger DB password
+$dbname = "u699891582_login";
+$dbuser = "u699891582_login";
+$dbpass = "A23x$%6^vC";
 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 

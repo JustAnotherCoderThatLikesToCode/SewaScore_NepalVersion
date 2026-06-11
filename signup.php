@@ -1,38 +1,21 @@
 <?php
-// CONNECT TO DATABASE
-$servername = "localhost";
-$username = "root"; 
-$password = ""; 
-$dbname = "sewascore"; // <-- make sure this matches your actual DB name
+require "connection.php";
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+$proxy = $_POST['proxy'] ?? '';
+$phone = $_POST['phone'] ?? '';
+$email = $_POST['email'] ?? '';
+$password = $_POST['password'] ?? '';
 
-// CHECK CONNECTION
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+$sql = "INSERT INTO users (proxy, phone, email, password)
+        VALUES (?, ?, ?, ?)";
 
-// GET FORM DATA
-$user = $_POST['username'];
-$pass = $_POST['password'];
-$phone = $_POST['phone'];
-$proxy = $_POST['proxy'];
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("ssss", $proxy, $phone, $email, $password);
 
-// PREVENT EMPTY VALUES
-if (empty($user) || empty($pass) || empty($phone) || empty($proxy)) {
-    die("All fields are required.");
-}
-
-// INSERT INTO DATABASE
-$sql = "INSERT INTO users (username, password, phone, proxy) 
-        VALUES ('$user', '$pass', '$phone', '$proxy')";
-
-if ($conn->query($sql) === TRUE) {
-    echo "Signup successful!";
+if ($stmt->execute()) {
+    header("Location: pm.html");
+    exit();
 } else {
-    echo "Error: " . $conn->error;
+    echo "Error: " . $stmt->error;
 }
-header("Location: pm.html");
-exit();
-$conn->close();
 ?>
