@@ -142,45 +142,52 @@
 </head>
 <body>
 
-  <!-- Background layers (identical structure to signup) -->
-  <div class="bg-root">
-    <div class="bg-parallax" id="bgParallax">
-      <div class="aurora" id="aurora"></div>
-      <div class="fog-layer" id="fogLayer"></div>
-      <div class="dust-layer" id="dustLayer"></div>
-      <div class="orb-layer" id="orbLayer"></div>
-    </div>
+<!-- Background layers -->
+<div class="bg-root">
+  <div class="bg-parallax" id="bgParallax">
+    <div class="aurora" id="aurora"></div>
+    <div class="fog-layer" id="fogLayer"></div>
+    <div class="dust-layer" id="dustLayer"></div>
+    <div class="orb-layer" id="orbLayer"></div>
   </div>
+</div>
 
-  <!-- Login card (same layout + styling as signup) -->
-  <div class="signup-card-wrap">
-    <div class="signup-card" role="form" aria-labelledby="loginTitle">
-      <div class="shimmer" aria-hidden="true"></div>
-<button class="card-back" type="button" aria-label="Go back">
-  <span class="card-back-icon" aria-hidden="true">←</span>
-  <span class="card-back-text">Back</span>
-</button>
-      <h2 id="loginTitle">Welcome Back</h2>
-      <div class="signup-sub">Log in to your SewaScore account.</div>
+<!-- Login card -->
+<div class="signup-card-wrap">
+  <div class="signup-card" role="form" aria-labelledby="loginTitle">
+    <div class="shimmer" aria-hidden="true"></div>
+
+    <button class="card-back" type="button" aria-label="Go back">
+      <span class="card-back-icon" aria-hidden="true">←</span>
+      <span class="card-back-text">Back</span>
+    </button>
+
+    <h2 id="loginTitle">Welcome Back</h2>
+    <div class="signup-sub">Log in to your SewaScore account.</div>
+
+    <!-- ⭐ REAL LOGIN FORM ⭐ -->
+    <form action="login.php" method="POST" style="width:100%;">
 
       <div class="field">
-        <input id="loginEmail" type="email" placeholder="Email" autocomplete="email" />
+        <input id="loginEmail" name="email" type="email" placeholder="Email" autocomplete="email" required />
       </div>
 
       <div class="field">
         <div style="position:relative;">
-          <input id="loginPassword" type="password" placeholder="Password" autocomplete="current-password" />
+          <input id="loginPassword" name="password" type="password" placeholder="Password" autocomplete="current-password" required />
           <button id="togglePwd" aria-label="Show password" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:transparent; border:0; cursor:pointer; font-size:14px; color:var(--muted); padding:6px;">👁</button>
         </div>
       </div>
 
-      <button class="login-btn" id="loginBtn" aria-label="Log in">Log In</button>
+      <button class="login-btn" type="submit" aria-label="Log in">Log In</button>
 
-      <a class="signup-link" href="signup.html">Don't have an account? Create one</a>
+    </form>
 
-      <div id="loginError" class="error" role="alert" aria-live="polite"></div>
-    </div>
+    <a class="signup-link" href="signup.html">Don't have an account? Create one</a>
+
+    <div id="loginError" class="error" role="alert" aria-live="polite"></div>
   </div>
+</div>
 
 <script>
 /* ---------- Reuse the same fog/dust/orb generators (lighter counts for login) ---------- */
