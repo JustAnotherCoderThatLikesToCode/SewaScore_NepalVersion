@@ -4,6 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Rate the Prime Minister — SewaScore</title>
+  <body>
+
+<script>
+    const user = localStorage.getItem("loggedInUser");
+    if (!user) {
+        window.location.href = "login.html";
+    }
+</script>
 
   <style>
     body {
@@ -313,7 +321,15 @@
   </style>
 </head>
 
-<body>
+  <body>
+<script>
+    const user = localStorage.getItem("loggedInUser");
+    if (!user) {
+        alert("You must log in to rate the Prime Minister.");
+        window.location.href = "login.html";
+    }
+</script>
+<p>Logged in as: <span id="loggedInAs"></span></p>
     <!-- Background Effects -->
 <div class="bg-root">
   <div class="bg-parallax" id="bgParallax">
@@ -323,7 +339,7 @@
     <div class="orb-layer" id="orbLayer"></div>
   </div>
 </div>
-
+<button onclick="logout()">Logout</button>
   <div class="page">
 
     <div class="header">
@@ -539,21 +555,12 @@ document.querySelectorAll(".deep-stars").forEach(group => {
         "\nFeedback: " + (feedback || "(none)")
       );
     });
-    // Block rating if not logged in
-if (!localStorage.getItem("loggedInUser")) {
-  alert("You must log in to rate the Prime Minister.");
-  window.location.href = "login.html";
+function logout() {
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "login.html";
 }
-fetch("checkSession.php")
-  .then(res => res.json())
-  .then(data => {
-    if (!data.loggedIn) {
-      alert("You must log in to rate the Prime Minister.");
-      window.location.href = "login.html";
-    }
-  });
-
+document.getElementById("loggedInAs").textContent =
+    localStorage.getItem("loggedInUser");
   </script>
-
 </body>
 </html>
