@@ -141,7 +141,12 @@
 </style>
 </head>
 <body>
-
+<script>
+    const user = localStorage.getItem("loggedInUser");
+    if (!user) {
+        window.location.href = "login.html";
+    }
+</script>
 <!-- Background layers -->
 <div class="bg-root">
   <div class="bg-parallax" id="bgParallax">
@@ -175,7 +180,7 @@
       <div class="field">
         <div style="position:relative;">
           <input id="loginPassword" name="password" type="password" placeholder="Password" autocomplete="current-password" required />
-          <button id="togglePwd" aria-label="Show password" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:transparent; border:0; cursor:pointer; font-size:14px; color:var(--muted); padding:6px;">👁</button>
+        <button id="togglePwd" type="button" aria-label="Show password" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:transparent; border:0; cursor:pointer; font-size:14px; color:var(--muted); padding:6px;">👁</button>
         </div>
       </div>
 

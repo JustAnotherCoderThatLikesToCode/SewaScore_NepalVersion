@@ -14,13 +14,25 @@ $result = $stmt->get_result();
 if ($result->num_rows === 1) {
     $user = $result->fetch_assoc();
 
-    if (password_verify($password, $user['password'])) {
-        $_SESSION['user'] = $user['id']; // store user ID
-        header("Location: pm.html");
+    // Plain text password check (because signup stores plain text)
+    if ($password === $user['password']) {
+
+        // Store user ID in session
+        $_SESSION['user'] = $user['id'];
+
+        // ALSO store login in localStorage so pm.html allows rating
+        echo "<script>
+            localStorage.setItem('loggedInUser', '$email');
+            window.location.href = 'pm.html';
+        </script>";
         exit();
     }
 }
 
-header("Location: login.html?error=1");
+// If login fails
+echo "<script>
+    alert('Invalid email or password.');
+    window.location.href = 'login.html?error=1';
+</script>";
 exit();
 ?>

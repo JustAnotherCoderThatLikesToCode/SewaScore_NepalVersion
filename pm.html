@@ -4,14 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Rate the Prime Minister — SewaScore</title>
-  <body>
-
-<script>
-    const user = localStorage.getItem("loggedInUser");
-    if (!user) {
-        window.location.href = "login.html";
-    }
-</script>
 
   <style>
     body {
@@ -191,7 +183,6 @@
       z-index: 2;
     }
 
-    /* Deep Rater Toggle */
     .deep-toggle {
       margin-top: 35px;
       font-size: 1.4rem;
@@ -247,90 +238,88 @@
       color: #facc15;
       transform: scale(1.1);
     }
-    /* Background Root */
-.bg-root {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: -20;
-  overflow: hidden;
-}
 
-.bg-parallax {
-  position: absolute;
-  inset: 0;
-  transition: transform .12s linear;
-}
+    .bg-root {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -20;
+      overflow: hidden;
+    }
 
-/* Aurora */
-.aurora {
-  position: absolute;
-  inset: -30%;
-  mix-blend-mode: screen;
-  filter: blur(36px) saturate(1.45);
-  background:
-    radial-gradient(1100px 520px at 12% 12%, rgba(6,182,212,0.78), transparent 30%),
-    radial-gradient(1200px 540px at 88% 18%, rgba(124,58,237,0.72), transparent 30%),
-    radial-gradient(900px 480px at 50% 82%, rgba(236,72,153,0.48), transparent 30%);
-  animation: auroraShift 16s ease-in-out infinite alternate;
-}
+    .bg-parallax {
+      position: absolute;
+      inset: 0;
+      transition: transform .12s linear;
+    }
 
-@keyframes auroraShift {
-  0% { transform: translate(-3%, -4%) scale(1); }
-  100% { transform: translate(3%, 4%) scale(1.05); }
-}
+    .aurora {
+      position: absolute;
+      inset: -30%;
+      mix-blend-mode: screen;
+      filter: blur(36px) saturate(1.45);
+      background:
+        radial-gradient(1100px 520px at 12% 12%, rgba(6,182,212,0.78), transparent 30%),
+        radial-gradient(1200px 540px at 88% 18%, rgba(124,58,237,0.72), transparent 30%),
+        radial-gradient(900px 480px at 50% 82%, rgba(236,72,153,0.48), transparent 30%);
+      animation: auroraShift 16s ease-in-out infinite alternate;
+    }
 
-/* Fog */
-.fog-layer { position: absolute; inset: 0; }
-.fog-blob {
-  position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #fff, #d2dce6 40%, #a0aabe12 70%, transparent);
-  filter: blur(28px);
-  opacity: .12;
-}
+    @keyframes auroraShift {
+      0% { transform: translate(-3%, -4%) scale(1); }
+      100% { transform: translate(3%, 4%) scale(1.05); }
+    }
 
-/* Dust */
-.dust-layer { position: absolute; inset: 0; }
-.dust {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(120,130,140,0.85);
-  filter: blur(.6px);
-  opacity: .7;
-}
-.dust.small { width: 4px; height: 4px; }
-.dust.large { width: 10px; height: 10px; }
+    .fog-layer { position: absolute; inset: 0; }
+    .fog-blob {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fff, #d2dce6 40%, #a0aabe12 70%, transparent);
+      filter: blur(28px);
+      opacity: .12;
+    }
 
-/* Orbs */
-.orb-layer { position: absolute; inset: 0; }
-.orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(6px);
-  opacity: .9;
-  animation: orbFloat linear infinite;
-}
+    .dust-layer { position: absolute; inset: 0; }
+    .dust {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(120,130,140,0.85);
+      filter: blur(.6px);
+      opacity: .7;
+    }
+    .dust.small { width: 4px; height: 4px; }
+    .dust.large { width: 10px; height: 10px; }
 
-@keyframes orbFloat {
-  0% { transform: translate(0,0) scale(.9); }
-  50% { transform: translate(40px,-120px) scale(1.15); }
-  100% { transform: translate(-60px,-260px) scale(.85); }
-}
+    .orb-layer { position: absolute; inset: 0; }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(6px);
+      opacity: .9;
+      animation: orbFloat linear infinite;
+    }
 
+    @keyframes orbFloat {
+      0% { transform: translate(0,0) scale(.9); }
+      50% { transform: translate(40px,-120px) scale(1.15); }
+      100% { transform: translate(-60px,-260px) scale(.85); }
+    }
   </style>
 </head>
 
-  <body>
+<body>
+
 <script>
-    const user = localStorage.getItem("loggedInUser");
-    if (!user) {
-        alert("You must log in to rate the Prime Minister.");
-        window.location.href = "login.html";
-    }
+  const user = localStorage.getItem("loggedInUser");
+  if (!user) {
+      alert("You must log in to rate the Prime Minister.");
+      window.location.href = "login.html";
+  }
 </script>
+
 <p>Logged in as: <span id="loggedInAs"></span></p>
-    <!-- Background Effects -->
+<button onclick="logout()">Logout</button>
+
 <div class="bg-root">
   <div class="bg-parallax" id="bgParallax">
     <div class="aurora"></div>
@@ -339,228 +328,220 @@
     <div class="orb-layer" id="orbLayer"></div>
   </div>
 </div>
-<button onclick="logout()">Logout</button>
-  <div class="page">
 
-    <div class="header">
-      <div class="title">
-        <h1>Rate the Prime Minister</h1>
-        <p>Your feedback helps support transparency.</p>
-      </div>
-      <a href="index.html" class="back-btn">← Back</a>
+<div class="page">
+
+  <div class="header">
+    <div class="title">
+      <h1>Rate the Prime Minister</h1>
+      <p>Your feedback helps support transparency.</p>
+    </div>
+    <a href="index.html" class="back-btn">← Back</a>
+  </div>
+
+  <div class="pm-card">
+
+    <div class="nepal-banner"></div>
+
+    <img src="balen_shah.avif" class="pm-photo">
+
+    <div class="pm-name">Prime Minister of Nepal</div>
+    <div class="pm-role">Head of Government</div>
+
+    <div class="stars" id="stars">
+      <span class="star" data-val="1">★</span>
+      <span class="star" data-val="2">★</span>
+      <span class="star" data-val="3">★</span>
+      <span class="star" data-val="4">★</span>
+      <span class="star" data-val="5">★</span>
     </div>
 
-    <div class="pm-card">
+    <textarea id="feedback" placeholder="Write your feedback..."></textarea>
 
-      <div class="nepal-banner"></div>
+    <div class="deep-toggle" id="deepToggle">Deep Rater ⯆</div>
 
-      <img src="balen_shah.avif" class="pm-photo">
+    <div class="deep-rater" id="deepRater">
 
-      <div class="pm-name">Prime Minister of Nepal</div>
-      <div class="pm-role">Head of Government</div>
-
-      <div class="stars" id="stars">
-        <span class="star" data-val="1">★</span>
-        <span class="star" data-val="2">★</span>
-        <span class="star" data-val="3">★</span>
-        <span class="star" data-val="4">★</span>
-        <span class="star" data-val="5">★</span>
+      <div class="deep-row">
+        <label>Work Done</label>
+        <div class="deep-stars" data-field="work_done">★ ★ ★ ★ ★</div>
       </div>
 
-      <textarea id="feedback" placeholder="Write your feedback..."></textarea>
+      <div class="deep-row">
+        <label>Service to People</label>
+        <div class="deep-stars" data-field="service_people">★ ★ ★ ★ ★</div>
+      </div>
 
-      <!-- Deep Rater Toggle -->
-      <div class="deep-toggle" id="deepToggle">Deep Rater ⯆</div>
+      <div class="deep-row">
+        <label>Honesty</label>
+        <div class="deep-stars" data-field="honesty">★ ★ ★ ★ ★</div>
+      </div>
 
-      <!-- Deep Rater Section -->
-     <div class="deep-rater" id="deepRater">
+      <div class="deep-row">
+        <label>Anti-Corruption</label>
+        <div class="deep-stars" data-field="fights_corruption">★ ★ ★ ★ ★</div>
+      </div>
 
-  <div class="deep-row">
-    <label>Work Done</label>
-    <div class="deep-stars" data-field="work_done">★ ★ ★ ★ ★</div>
-  </div>
+      <div class="deep-row">
+        <label>Development Work</label>
+        <div class="deep-stars" data-field="development_work">★ ★ ★ ★ ★</div>
+      </div>
 
-  <div class="deep-row">
-    <label>Service to People</label>
-    <div class="deep-stars" data-field="service_people">★ ★ ★ ★ ★</div>
-  </div>
+      <div class="deep-row">
+        <label>Communication & Clarity</label>
+        <div class="deep-stars" data-field="communication_clarity">★ ★ ★ ★ ★</div>
+      </div>
 
-  <div class="deep-row">
-    <label>Honesty</label>
-    <div class="deep-stars" data-field="honesty">★ ★ ★ ★ ★</div>
-  </div>
+      <div class="deep-row">
+        <label>Leadership & Vision</label>
+        <div class="deep-stars" data-field="leadership_vision">★ ★ ★ ★ ★</div>
+      </div>
 
-  <div class="deep-row">
-    <label>Anti-Corruption</label>
-    <div class="deep-stars" data-field="fights_corruption">★ ★ ★ ★ ★</div>
-  </div>
+      <div class="deep-row">
+        <label>Diplomacy & Foreign Relations</label>
+        <div class="deep-stars" data-field="diplomacy_foreign">★ ★ ★ ★ ★</div>
+      </div>
 
-  <div class="deep-row">
-    <label>Development Work</label>
-    <div class="deep-stars" data-field="development_work">★ ★ ★ ★ ★</div>
-  </div>
+      <div class="deep-row">
+        <label>Strengthening Institutions</label>
+        <div class="deep-stars" data-field="institutions">★ ★ ★ ★ ★</div>
+      </div>
 
-  <div class="deep-row">
-    <label>Communication & Clarity</label>
-    <div class="deep-stars" data-field="communication_clarity">★ ★ ★ ★ ★</div>
-  </div>
+      <div class="deep-row">
+        <label>Long-Term Plan for Nepal</label>
+        <div class="deep-stars" data-field="longterm_plan">★ ★ ★ ★ ★</div>
+      </div>
 
-  <div class="deep-row">
-    <label>Leadership & Vision</label>
-    <div class="deep-stars" data-field="leadership_vision">★ ★ ★ ★ ★</div>
-  </div>
+    </div>
 
-  <div class="deep-row">
-    <label>Diplomacy & Foreign Relations</label>
-    <div class="deep-stars" data-field="diplomacy_foreign">★ ★ ★ ★ ★</div>
-  </div>
+    <button class="submit-btn" id="submitBtn">Submit Rating</button>
 
-  <div class="deep-row">
-    <label>Strengthening Institutions</label>
-    <div class="deep-stars" data-field="institutions">★ ★ ★ ★ ★</div>
-  </div>
-
-  <div class="deep-row">
-    <label>Long-Term Plan for Nepal</label>
-    <div class="deep-stars" data-field="longterm_plan">★ ★ ★ ★ ★</div>
+    <div class="note">This is a UI demo. You can connect it to a backend or Google Sheet later.</div>
   </div>
 
 </div>
 
+<script>
+  const rand = (a,b) => a + Math.random() * (b - a);
 
-      <button class="submit-btn" id="submitBtn">Submit Rating</button>
+  (function fog(){
+    const root = document.getElementById("fogLayer");
+    for(let i=0;i<12;i++){
+      const b = document.createElement("div");
+      b.className = "fog-blob";
+      const w = Math.round(rand(260,760));
+      const h = Math.round(w * rand(.45,.85));
+      b.style.width = w+"px";
+      b.style.height = h+"px";
+      b.style.left = (rand(-.12,1.12)*100)+"%";
+      b.style.top = (rand(.6,1.05)*100)+"%";
+      b.style.animation = `fogMove ${Math.round(rand(28,72))}s linear infinite`;
+      root.appendChild(b);
+    }
+  })();
 
-      <div class="note">This is a UI demo. You can connect it to a backend or Google Sheet later.</div>
-    </div>
+  (function dust(){
+    const root = document.getElementById("dustLayer");
+    for(let i=0;i<120;i++){
+      const d = document.createElement("div");
+      d.className = "dust";
+      if(Math.random()<.12) d.classList.add("large");
+      else if(Math.random()<.35) d.classList.add("small");
+      d.style.left = (Math.random()*100)+"%";
+      d.style.top = (rand(.6,1.05)*100)+"%";
+      d.style.animationDuration = rand(8,18)+"s";
+      root.appendChild(d);
+    }
+  })();
 
-  </div>
+  (function orbs(){
+    const root = document.getElementById("orbLayer");
+    for(let i=0;i<20;i++){
+      const o = document.createElement("div");
+      o.className = "orb";
+      const size = Math.round(rand(28,88));
+      o.style.width = size+"px";
+      o.style.height = size+"px";
+      o.style.left = (Math.random()*100)+"%";
+      o.style.top = (rand(.6,1.05)*100)+"%";
+      o.style.animationDuration = rand(6,14)+"s";
+      const hue = Math.round(rand(180,320));
+      o.style.background = `radial-gradient(circle at 30% 30%, #fff, hsla(${hue},85%,80%,.95) 35%, hsla(${hue},85%,70%,.28) 70%, transparent)`;
+      root.appendChild(o);
+    }
+  })();
 
-  <script>
-    // Utility
-const rand = (a,b) => a + Math.random() * (b - a);
+  window.addEventListener("mousemove", e => {
+    const x = (e.clientX / window.innerWidth) - .5;
+    const y = (e.clientY / window.innerHeight) - .5;
+    document.getElementById("bgParallax").style.transform =
+      `translate(${x*10}px, ${y*10}px)`;
+  });
 
-// Fog
-(function fog(){
-  const root = document.getElementById("fogLayer");
-  for(let i=0;i<12;i++){
-    const b = document.createElement("div");
-    b.className = "fog-blob";
-    const w = Math.round(rand(260,760));
-    const h = Math.round(w * rand(.45,.85));
-    b.style.width = w+"px";
-    b.style.height = h+"px";
-    b.style.left = (rand(-.12,1.12)*100)+"%";
-    b.style.top = (rand(.6,1.05)*100)+"%";
-    b.style.animation = `fogMove ${Math.round(rand(28,72))}s linear infinite`;
-    root.appendChild(b);
-  }
-})();
+  const stars = document.querySelectorAll(".star");
+  let rating = 0;
 
-// Dust
-(function dust(){
-  const root = document.getElementById("dustLayer");
-  for(let i=0;i<120;i++){
-    const d = document.createElement("div");
-    d.className = "dust";
-    if(Math.random()<.12) d.classList.add("large");
-    else if(Math.random()<.35) d.classList.add("small");
-    d.style.left = (Math.random()*100)+"%";
-    d.style.top = (rand(.6,1.05)*100)+"%";
-    d.style.animationDuration = rand(8,18)+"s";
-    root.appendChild(d);
-  }
-})();
+  stars.forEach(star => {
+    star.addEventListener("click", () => {
+      rating = parseInt(star.dataset.val);
+      stars.forEach((s, i) => s.classList.toggle("active", i < rating));
+    });
+  });
 
-// Orbs
-(function orbs(){
-  const root = document.getElementById("orbLayer");
-  for(let i=0;i<20;i++){
-    const o = document.createElement("div");
-    o.className = "orb";
-    const size = Math.round(rand(28,88));
-    o.style.width = size+"px";
-    o.style.height = size+"px";
-    o.style.left = (Math.random()*100)+"%";
-    o.style.top = (rand(.6,1.05)*100)+"%";
-    o.style.animationDuration = rand(6,14)+"s";
-    const hue = Math.round(rand(180,320));
-    o.style.background = `radial-gradient(circle at 30% 30%, #fff, hsla(${hue},85%,80%,.95) 35%, hsla(${hue},85%,70%,.28) 70%, transparent)`;
-    root.appendChild(o);
-  }
-})();
+  const deepToggle = document.getElementById("deepToggle");
+  const deepRater = document.getElementById("deepRater");
 
-// Parallax
-window.addEventListener("mousemove", e => {
-  const x = (e.clientX / window.innerWidth) - .5;
-  const y = (e.clientY / window.innerHeight) - .5;
-  document.getElementById("bgParallax").style.transform =
-    `translate(${x*10}px, ${y*10}px)`;
-});
+  deepToggle.addEventListener("click", () => {
+    deepRater.classList.toggle("open");
+    deepToggle.textContent = deepRater.classList.contains("open")
+      ? "Deep Rater ⯅"
+      : "Deep Rater ⯆";
+  });
 
-    const stars = document.querySelectorAll(".star");
-    let rating = 0;
+  const deepRatings = {};
 
-    stars.forEach(star => {
-      star.addEventListener("click", () => {
-        rating = parseInt(star.dataset.val);
-        stars.forEach((s, i) => s.classList.toggle("active", i < rating));
+  document.querySelectorAll(".deep-stars").forEach(group => {
+    const field = group.dataset.field;
+
+    const stars = group.innerText.trim().split(" ").map(() => {
+      const span = document.createElement("span");
+      span.textContent = "★";
+      return span;
+    });
+
+    group.innerHTML = "";
+    stars.forEach(s => group.appendChild(s));
+
+    group.addEventListener("click", e => {
+      if (e.target.textContent !== "★") return;
+
+      const index = [...group.children].indexOf(e.target);
+      deepRatings[field] = index + 1;
+
+      [...group.children].forEach((s, i) => {
+        s.classList.toggle("active", i <= index);
       });
     });
-
-    // Deep Rater Toggle
-    const deepToggle = document.getElementById("deepToggle");
-    const deepRater = document.getElementById("deepRater");
-
-    deepToggle.addEventListener("click", () => {
-      deepRater.classList.toggle("open");
-      deepToggle.textContent = deepRater.classList.contains("open")
-        ? "Deep Rater ⯅"
-        : "Deep Rater ⯆";
-    });
-
-    // Deep Rater Logic
-    const deepRatings = {};
-
-document.querySelectorAll(".deep-stars").forEach(group => {
-  const field = group.dataset.field;
-
-  const stars = group.innerText.trim().split(" ").map(() => {
-    const span = document.createElement("span");
-    span.textContent = "★";
-    return span;
   });
 
-  group.innerHTML = "";
-  stars.forEach(s => group.appendChild(s));
+  document.getElementById("submitBtn").addEventListener("click", () => {
+    const feedback = document.getElementById("feedback").value.trim();
 
-  group.addEventListener("click", e => {
-    if (e.target.textContent !== "★") return;
-
-    const index = [...group.children].indexOf(e.target);
-    deepRatings[field] = index + 1;
-
-    [...group.children].forEach((s, i) => {
-      s.classList.toggle("active", i <= index);
-    });
+    alert(
+      "Main Rating: " + rating +
+      "\nDeep Ratings: " + JSON.stringify(deepRatings, null, 2) +
+      "\nFeedback: " + (feedback || "(none)")
+    );
   });
-});
 
-
-    document.getElementById("submitBtn").addEventListener("click", () => {
-      const feedback = document.getElementById("feedback").value.trim();
-
-      alert(
-        "Main Rating: " + rating +
-        "\nDeep Ratings: " + JSON.stringify(deepRatings, null, 2) +
-        "\nFeedback: " + (feedback || "(none)")
-      );
-    });
-function logout() {
+  function logout() {
     localStorage.removeItem("loggedInUser");
     window.location.href = "login.html";
-}
-document.getElementById("loggedInAs").textContent =
+  }
+
+  document.getElementById("loggedInAs").textContent =
     localStorage.getItem("loggedInUser");
-  </script>
+</script>
+
 </body>
 </html>
