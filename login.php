@@ -2,37 +2,42 @@
 session_start();
 require "connection.php";
 
-$email = $_POST['email'];
-$password = $_POST['password'];
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $email = trim($_POST["email"]);
+    $password = trim($_POST["password"]);
 
-$sql = "SELECT * FROM users WHERE email = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$result = $stmt->get_result();
+    // Fetch user from DB
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-if ($result->num_rows === 1) {
-    $user = $result->fetch_assoc();
+    // If user exists
+    if ($result->num_rows === 1) {
+        $user = $result->fetch_assoc();
 
-    // Plain text password check (because signup stores plain text)
-    if ($password === $user['password']) {
+        // Compare plain password (since you're not hashing yet)
+        if ($password === $user["password"]) {
 
-        // Store user ID in session
-        $_SESSION['user'] = $user['id'];
-
-        // ALSO store login in localStorage so pm.html allows rating
+            // SUCCESS — send JS to browser
+            echo "<script>
+                localStorage.setItem('loggedInUser', '$email');
+                window.location.href = 'pm.html';
+            </script>";
+            exit;
+        } else {
+            echo "<script>
+                alert('Invalid email or password.');
+                window.location.href = 'login.html';
+            </script>";
+            exit;
+        }
+    } else {
         echo "<script>
-            localStorage.setItem('loggedInUser', '$email');
-            window.location.href = 'pm.html';
+            alert('User not found.');
+            window.location.href = 'login.html';
         </script>";
-        exit();
+        exit;
     }
 }
-
-// If login fails
-echo "<script>
-    alert('Invalid email or password.');
-    window.location.href = 'login.html?error=1';
-</script>";
-exit();
 ?>
