@@ -16,18 +16,73 @@
       padding: 20px;
     }
 
+    /* PROFILE BAR */
+    .user-bar {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 18px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.25);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,0.35);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+      animation: fadeIn 0.4s ease-out;
+      z-index: 999;
+    }
+    .user-pfp {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255,255,255,0.6);
+    }
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .user-email {
+      font-size: 0.9rem;
+      font-weight: 700;
+      background: linear-gradient(90deg,#06b6d4,#7c3aed);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+.logout-btn {
+  padding: 8px 18px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  color: #ef4444;
+  cursor: pointer;
+  transition: 0.25s ease;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+}
+
+.logout-btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(90deg,#ef4444,#dc2626);
+  color: white;
+  box-shadow: 0 8px 22px rgba(239,68,68,0.45);
+}
+
+
     .page {
       max-width: 900px;
       margin: 0 auto;
+      margin-top: 100px;
     }
-
     .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      text-align: center;
       margin-bottom: 24px;
     }
-
     .title h1 {
       margin: 0;
       font-size: 2rem;
@@ -36,21 +91,10 @@
       -webkit-background-clip: text;
       color: transparent;
     }
-
     .title p {
       margin: 4px 0 0;
       color: #475569;
       font-size: .95rem;
-    }
-
-    .back-btn {
-      text-decoration: none;
-      padding: 8px 16px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.9);
-      border: 1px solid rgba(14,30,37,0.08);
-      font-weight: 700;
-      color: #071029;
     }
 
     .pm-card {
@@ -66,7 +110,6 @@
       margin: 0 auto;
       overflow: hidden;
     }
-
     .nepal-banner {
       position: absolute;
       top: 0;
@@ -78,7 +121,6 @@
       z-index: 0;
       pointer-events: none;
     }
-
     .pm-photo {
       width: 190px;
       height: 190px;
@@ -93,13 +135,11 @@
       position: relative;
       z-index: 2;
     }
-
     @keyframes floatPic {
       0% { transform: translateY(0px); }
       50% { transform: translateY(-6px); }
       100% { transform: translateY(0px); }
     }
-
     .pm-name {
       font-size: 1.6rem;
       font-weight: 900;
@@ -110,7 +150,6 @@
       position: relative;
       z-index: 2;
     }
-
     .pm-role {
       color: #475569;
       font-size: 1rem;
@@ -129,12 +168,10 @@
       position: relative;
       z-index: 2;
     }
-
     .star {
       color: #cbd5e1;
       transition: .15s;
     }
-
     .star.active {
       color: #facc15;
       transform: scale(1.1);
@@ -169,7 +206,6 @@
       position: relative;
       z-index: 2;
     }
-
     .submit-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 16px 40px rgba(37,99,235,0.35);
@@ -195,7 +231,6 @@
       position: relative;
       z-index: 2;
     }
-
     .deep-rater {
       max-height: 0;
       overflow: hidden;
@@ -203,12 +238,10 @@
       transition: max-height .5s ease, opacity .4s ease;
       margin-top: 10px;
     }
-
     .deep-rater.open {
       max-height: 900px;
       opacity: 1;
     }
-
     .deep-row {
       display: flex;
       justify-content: space-between;
@@ -220,12 +253,10 @@
       backdrop-filter: blur(8px);
       margin-bottom: 12px;
     }
-
     .deep-row label {
       font-weight: 700;
       color: #071029;
     }
-
     .deep-stars {
       font-size: 26px;
       cursor: pointer;
@@ -233,30 +264,15 @@
       letter-spacing: 4px;
       transition: .15s;
     }
-
     .deep-stars .active {
       color: #facc15;
       transform: scale(1.1);
     }
 
-    .bg-root {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: -20;
-      overflow: hidden;
-    }
-
-    .bg-parallax {
-      position: absolute;
-      inset: 0;
-      transition: transform .12s linear;
-    }
-
+    .bg-root { position: fixed; inset: 0; pointer-events: none; z-index: -20; overflow: hidden; }
+    .bg-parallax { position: absolute; inset: 0; transition: transform .12s linear; }
     .aurora {
-      position: absolute;
-      inset: -30%;
-      mix-blend-mode: screen;
+      position: absolute; inset: -30%; mix-blend-mode: screen;
       filter: blur(36px) saturate(1.45);
       background:
         radial-gradient(1100px 520px at 12% 12%, rgba(6,182,212,0.78), transparent 30%),
@@ -264,7 +280,6 @@
         radial-gradient(900px 480px at 50% 82%, rgba(236,72,153,0.48), transparent 30%);
       animation: auroraShift 16s ease-in-out infinite alternate;
     }
-
     @keyframes auroraShift {
       0% { transform: translate(-3%, -4%) scale(1); }
       100% { transform: translate(3%, 4%) scale(1.05); }
@@ -298,27 +313,32 @@
       opacity: .9;
       animation: orbFloat linear infinite;
     }
-
     @keyframes orbFloat {
       0% { transform: translate(0,0) scale(.9); }
       50% { transform: translate(40px,-120px) scale(1.15); }
       100% { transform: translate(-60px,-260px) scale(.85); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInScale {
+      0% { transform: scale(.85); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
     }
   </style>
 </head>
 
 <body>
 
-<script>
-  const user = localStorage.getItem("loggedInUser");
-  if (!user) {
-      alert("You must log in to rate the Prime Minister.");
-      window.location.href = "login.html";
-  }
-</script>
-
-<p>Logged in as: <span id="loggedInAs"></span></p>
-<button onclick="logout()">Logout</button>
+<div class="user-bar">
+  <img src="default_pfp.png" class="user-pfp">
+  <div class="user-info">
+    <div class="user-email" id="loggedInAs"></div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+</div>
 
 <div class="bg-root">
   <div class="bg-parallax" id="bgParallax">
@@ -330,17 +350,14 @@
 </div>
 
 <div class="page">
-
   <div class="header">
     <div class="title">
       <h1>Rate the Prime Minister</h1>
       <p>Your feedback helps support transparency.</p>
     </div>
-    <a href="index.html" class="back-btn">← Back</a>
   </div>
 
   <div class="pm-card">
-
     <div class="nepal-banner"></div>
 
     <img src="balen_shah.avif" class="pm-photo">
@@ -361,187 +378,338 @@
     <div class="deep-toggle" id="deepToggle">Deep Rater ⯆</div>
 
     <div class="deep-rater" id="deepRater">
-
       <div class="deep-row">
         <label>Work Done</label>
         <div class="deep-stars" data-field="work_done">★ ★ ★ ★ ★</div>
       </div>
-
       <div class="deep-row">
         <label>Service to People</label>
         <div class="deep-stars" data-field="service_people">★ ★ ★ ★ ★</div>
       </div>
-
       <div class="deep-row">
         <label>Honesty</label>
         <div class="deep-stars" data-field="honesty">★ ★ ★ ★ ★</div>
       </div>
-
       <div class="deep-row">
         <label>Anti-Corruption</label>
         <div class="deep-stars" data-field="fights_corruption">★ ★ ★ ★ ★</div>
       </div>
-
       <div class="deep-row">
         <label>Development Work</label>
         <div class="deep-stars" data-field="development_work">★ ★ ★ ★ ★</div>
       </div>
-
       <div class="deep-row">
         <label>Communication & Clarity</label>
         <div class="deep-stars" data-field="communication_clarity">★ ★ ★ ★ ★</div>
       </div>
-
       <div class="deep-row">
         <label>Leadership & Vision</label>
         <div class="deep-stars" data-field="leadership_vision">★ ★ ★ ★ ★</div>
       </div>
-
       <div class="deep-row">
         <label>Diplomacy & Foreign Relations</label>
         <div class="deep-stars" data-field="diplomacy_foreign">★ ★ ★ ★ ★</div>
       </div>
-
       <div class="deep-row">
         <label>Strengthening Institutions</label>
         <div class="deep-stars" data-field="institutions">★ ★ ★ ★ ★</div>
       </div>
-
       <div class="deep-row">
         <label>Long-Term Plan for Nepal</label>
         <div class="deep-stars" data-field="longterm_plan">★ ★ ★ ★ ★</div>
       </div>
-
     </div>
 
     <button class="submit-btn" id="submitBtn">Submit Rating</button>
 
     <div class="note">This is a UI demo. You can connect it to a backend or Google Sheet later.</div>
   </div>
+</div>
 
+<!-- Confetti -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+/* LOGIN CHECK (optional redirect) */
+const user = localStorage.getItem("loggedInUser");
+if (!user) {
+  alert("You must log in to rate the Prime Minister.");
+  window.location.href = "login.html";
+}
+
+/* Set profile email */
+document.getElementById("loggedInAs").textContent =
+  "Logged in as: " + localStorage.getItem("loggedInUser");
+
+/* Background FX init */
+const rand = (a,b) => a + Math.random() * (b - a);
+
+(function fog(){
+  const root = document.getElementById("fogLayer");
+  for(let i=0;i<12;i++){
+    const b = document.createElement("div");
+    b.className = "fog-blob";
+    const w = Math.round(rand(260,760));
+    const h = Math.round(w * rand(.45,.85));
+    b.style.width = w+"px";
+    b.style.height = h+"px";
+    b.style.left = (rand(-.12,1.12)*100)+"%";
+    b.style.top = (rand(.6,1.05)*100)+"%";
+    b.style.animation = `fogMove ${Math.round(rand(28,72))}s linear infinite`;
+    root.appendChild(b);
+  }
+})();
+
+(function dust(){
+  const root = document.getElementById("dustLayer");
+  for(let i=0;i<120;i++){
+    const d = document.createElement("div");
+    d.className = "dust";
+    if(Math.random()<.12) d.classList.add("large");
+    else if(Math.random()<.35) d.classList.add("small");
+    d.style.left = (Math.random()*100)+"%";
+    d.style.top = (rand(.6,1.05)*100)+"%";
+    d.style.animationDuration = rand(8,18)+"s";
+    root.appendChild(d);
+  }
+})();
+
+(function orbs(){
+  const root = document.getElementById("orbLayer");
+  for(let i=0;i<20;i++){
+    const o = document.createElement("div");
+    o.className = "orb";
+    const size = Math.round(rand(28,88));
+    o.style.width = size+"px";
+    o.style.height = size+"px";
+    o.style.left = (Math.random()*100)+"%";
+    o.style.top = (rand(.6,1.05)*100)+"%";
+    o.style.animationDuration = rand(6,14)+"s";
+    const hue = Math.round(rand(180,320));
+    o.style.background = `radial-gradient(circle at 30% 30%, #fff, hsla(${hue},85%,80%,.95) 35%, hsla(${hue},85%,70%,.28) 70%, transparent)`;
+    root.appendChild(o);
+  }
+})();
+
+window.addEventListener("mousemove", e => {
+  const x = (e.clientX / window.innerWidth) - .5;
+  const y = (e.clientY / window.innerHeight) - .5;
+  document.getElementById("bgParallax").style.transform =
+    `translate(${x*10}px, ${y*10}px)`;
+});
+
+/* Main stars */
+let rating = 0;
+document.querySelectorAll(".star").forEach(star => {
+  star.addEventListener("click", () => {
+    rating = parseInt(star.dataset.val);
+    document.querySelectorAll(".star").forEach(s => {
+      s.classList.toggle("active", parseInt(s.dataset.val) <= rating);
+    });
+  });
+});
+
+/* Deep rater */
+let deepRatings = {};
+document.querySelectorAll(".deep-stars").forEach(group => {
+  const field = group.dataset.field;
+  const stars = group.innerText.trim().split(" ").map(() => {
+    const span = document.createElement("span");
+    span.textContent = "★";
+    return span;
+  });
+  group.innerHTML = "";
+  stars.forEach(s => group.appendChild(s));
+  group.addEventListener("click", e => {
+    if (e.target.textContent !== "★") return;
+    const index = [...group.children].indexOf(e.target);
+    deepRatings[field] = index + 1;
+    [...group.children].forEach((s, i) => {
+      s.classList.toggle("active", i <= index);
+    });
+  });
+});
+
+/* Toggle deep rater */
+document.getElementById("deepToggle").addEventListener("click", () => {
+  const deepRater = document.getElementById("deepRater");
+  deepRater.classList.toggle("open");
+});
+
+/* Confetti */
+function confettiBurst() {
+  const duration = 1000;
+  const end = Date.now() + duration;
+  (function frame() {
+    confetti({
+      particleCount: 5,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0 }
+    });
+    confetti({
+      particleCount: 5,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1 }
+    });
+    if (Date.now() < end) {
+      requestAnimationFrame(frame);
+    }
+  })();
+}
+
+/* Submit */
+document.getElementById("submitBtn").addEventListener("click", () => {
+  const feedback = document.getElementById("feedback").value.trim();
+  const popup = document.getElementById("successPopup");
+  popup.style.display = "flex";
+  confettiBurst();
+  setTimeout(() => {
+    popup.style.display = "none";
+  }, 2000);
+  console.log("Main Rating:", rating);
+  console.log("Deep Ratings:", deepRatings);
+  console.log("Feedback:", feedback);
+});
+
+/* Logout */
+function logout() {
+  localStorage.removeItem("loggedInUser");
+  window.location.href = "login.html";
+}
+</script>
+
+<!-- IMAGE VERIFICATION MODAL -->
+<div id="verifyModal" style="
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+">
+  <div style="
+    background: white;
+    padding: 26px;
+    border-radius: 16px;
+    width: 360px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  ">
+    <h2 style="margin-top:0;">Human Verification</h2>
+    <p id="verifyPrompt" style="margin-bottom: 18px; font-size: 1rem;">
+      Loading challenge…
+    </p>
+    <div id="verifyImages" style="
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    "></div>
+  </div>
 </div>
 
 <script>
-  const rand = (a,b) => a + Math.random() * (b - a);
-
-  (function fog(){
-    const root = document.getElementById("fogLayer");
-    for(let i=0;i<12;i++){
-      const b = document.createElement("div");
-      b.className = "fog-blob";
-      const w = Math.round(rand(260,760));
-      const h = Math.round(w * rand(.45,.85));
-      b.style.width = w+"px";
-      b.style.height = h+"px";
-      b.style.left = (rand(-.12,1.12)*100)+"%";
-      b.style.top = (rand(.6,1.05)*100)+"%";
-      b.style.animation = `fogMove ${Math.round(rand(28,72))}s linear infinite`;
-      root.appendChild(b);
-    }
-  })();
-
-  (function dust(){
-    const root = document.getElementById("dustLayer");
-    for(let i=0;i<120;i++){
-      const d = document.createElement("div");
-      d.className = "dust";
-      if(Math.random()<.12) d.classList.add("large");
-      else if(Math.random()<.35) d.classList.add("small");
-      d.style.left = (Math.random()*100)+"%";
-      d.style.top = (rand(.6,1.05)*100)+"%";
-      d.style.animationDuration = rand(8,18)+"s";
-      root.appendChild(d);
-    }
-  })();
-
-  (function orbs(){
-    const root = document.getElementById("orbLayer");
-    for(let i=0;i<20;i++){
-      const o = document.createElement("div");
-      o.className = "orb";
-      const size = Math.round(rand(28,88));
-      o.style.width = size+"px";
-      o.style.height = size+"px";
-      o.style.left = (Math.random()*100)+"%";
-      o.style.top = (rand(.6,1.05)*100)+"%";
-      o.style.animationDuration = rand(6,14)+"s";
-      const hue = Math.round(rand(180,320));
-      o.style.background = `radial-gradient(circle at 30% 30%, #fff, hsla(${hue},85%,80%,.95) 35%, hsla(${hue},85%,70%,.28) 70%, transparent)`;
-      root.appendChild(o);
-    }
-  })();
-
-  window.addEventListener("mousemove", e => {
-    const x = (e.clientX / window.innerWidth) - .5;
-    const y = (e.clientY / window.innerHeight) - .5;
-    document.getElementById("bgParallax").style.transform =
-      `translate(${x*10}px, ${y*10}px)`;
-  });
-
-  const stars = document.querySelectorAll(".star");
-  let rating = 0;
-
-  stars.forEach(star => {
-    star.addEventListener("click", () => {
-      rating = parseInt(star.dataset.val);
-      stars.forEach((s, i) => s.classList.toggle("active", i < rating));
-    });
-  });
-
-  const deepToggle = document.getElementById("deepToggle");
-  const deepRater = document.getElementById("deepRater");
-
-  deepToggle.addEventListener("click", () => {
-    deepRater.classList.toggle("open");
-    deepToggle.textContent = deepRater.classList.contains("open")
-      ? "Deep Rater ⯅"
-      : "Deep Rater ⯆";
-  });
-
-  const deepRatings = {};
-
-  document.querySelectorAll(".deep-stars").forEach(group => {
-    const field = group.dataset.field;
-
-    const stars = group.innerText.trim().split(" ").map(() => {
-      const span = document.createElement("span");
-      span.textContent = "★";
-      return span;
-    });
-
-    group.innerHTML = "";
-    stars.forEach(s => group.appendChild(s));
-
-    group.addEventListener("click", e => {
-      if (e.target.textContent !== "★") return;
-
-      const index = [...group.children].indexOf(e.target);
-      deepRatings[field] = index + 1;
-
-      [...group.children].forEach((s, i) => {
-        s.classList.toggle("active", i <= index);
-      });
-    });
-  });
-
-  document.getElementById("submitBtn").addEventListener("click", () => {
-    const feedback = document.getElementById("feedback").value.trim();
-
-    alert(
-      "Main Rating: " + rating +
-      "\nDeep Ratings: " + JSON.stringify(deepRatings, null, 2) +
-      "\nFeedback: " + (feedback || "(none)")
-    );
-  });
-
-  function logout() {
-    localStorage.removeItem("loggedInUser");
-    window.location.href = "login.html";
+const challenges = [
+  {
+    prompt: "Select the flag of Nepal",
+    correct: "nepal_flag",
+    options: ["nepal_flag", "india_flag", "china_flag"]
+  },
+  {
+    prompt: "Select the picture of Mount Everest",
+    correct: "everest",
+    options: ["everest", "random_mountain", "himalaya"]
+  },
+  {
+    prompt: "Select the picture of Kathmandu",
+    correct: "kathmandu",
+    options: ["kathmandu", "pokhara", "bhaktapur"]
   }
+];
+const imageMap = {
+  nepal_flag: "https://upload.wikimedia.org/wikipedia/commons/9/9b/Flag_of_Nepal.svg",
+  india_flag: "https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg",
+  china_flag: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg",
 
-  document.getElementById("loggedInAs").textContent =
-    localStorage.getItem("loggedInUser");
+  // ⭐ NEW CORS-SAFE IMAGES ⭐
+  everest: "https://i.imgur.com/8YQFQ8K.jpeg",
+  random_mountain: "https://i.imgur.com/0ZQZQ0y.jpeg",
+  himalaya: "https://i.imgur.com/8k7x1rF.jpeg",
+
+  kathmandu: "https://i.imgur.com/1xg7x0P.jpeg",
+  pokhara: "https://i.imgur.com/7p8x0kT.jpeg",
+  bhaktapur: "https://i.imgur.com/4Q0n1mS.jpeg"
+};
+
+function loadChallenge() {
+  const modal = document.getElementById("verifyModal");
+  const promptEl = document.getElementById("verifyPrompt");
+  const imgContainer = document.getElementById("verifyImages");
+
+  imgContainer.innerHTML = "";
+
+  const challenge = challenges[Math.floor(Math.random() * challenges.length)];
+  promptEl.textContent = challenge.prompt;
+
+  const shuffled = [...challenge.options].sort(() => Math.random() - 0.5);
+
+  shuffled.forEach(key => {
+    const img = document.createElement("img");
+    img.src = imageMap[key];
+    img.style.width = "90px";
+    img.style.height = "70px";
+    img.style.objectFit = "cover";
+    img.style.borderRadius = "8px";
+    img.style.cursor = "pointer";
+    img.style.border = "2px solid transparent";
+
+    img.onclick = () => {
+      if (key === challenge.correct) {
+        modal.style.display = "none";
+      } else {
+        alert("Incorrect. Try again.");
+        loadChallenge();
+      }
+    };
+
+    imgContainer.appendChild(img);
+  });
+}
+
+window.addEventListener("load", loadChallenge);
 </script>
+
+<!-- SUCCESS POPUP -->
+<div id="successPopup" style="
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+">
+  <div style="
+    background: white;
+    padding: 26px;
+    border-radius: 16px;
+    width: 340px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    animation: fadeInScale .3s ease-out;
+  ">
+    <h2 style="margin-top:0; background: linear-gradient(90deg,#06b6d4,#7c3aed); -webkit-background-clip:text; color:transparent;">
+      Thank You!
+    </h2>
+    <p style="font-size:1rem; color:#475569; margin-bottom:0;">
+      Your rating has been submitted.
+    </p>
+  </div>
+</div>
 
 </body>
 </html>

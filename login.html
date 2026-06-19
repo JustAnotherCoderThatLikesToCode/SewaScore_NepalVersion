@@ -141,12 +141,6 @@
 </style>
 </head>
 <body>
-<script>
-    const user = localStorage.getItem("loggedInUser");
-    if (!user) {
-        window.location.href = "login.html";
-    }
-</script>
 <!-- Background layers -->
 <div class="bg-root">
   <div class="bg-parallax" id="bgParallax">
@@ -430,7 +424,60 @@ function rand(min,max){return Math.random()*(max-min)+min}
     window.location.href = 'index.html';
   }, { passive: true });
 })();
+function humanVerify() {
+    const a = Math.floor(Math.random() * 10);
+    const b = Math.floor(Math.random() * 10);
+    const answer = prompt(`Human Check: What is ${a} + ${b}?`);
+    return parseInt(answer) === a + b;
+}
 
+document.querySelector(".login-btn").addEventListener("click", function (e) {
+    e.preventDefault();
+
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value.trim();
+
+    if (!email || !password) {
+        alert("Please enter email and password.");
+        return;
+    }
+
+    if (!humanVerify()) {
+        alert("Verification failed. Try again.");
+        return;
+    }
+
+    // SUCCESS
+    localStorage.setItem("loggedInUser", email);
+    window.location.href = "pm.html";
+});
+function humanVerify() {
+    const a = Math.floor(Math.random() * 10);
+    const b = Math.floor(Math.random() * 10);
+    const answer = prompt(`Human Check: What is ${a} + ${b}?`);
+    return parseInt(answer) === a + b;
+}
+
+document.querySelector(".login-btn").addEventListener("click", function (e) {
+    e.preventDefault();
+
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value.trim();
+
+    if (!email || !password) {
+        alert("Please enter email and password.");
+        return;
+    }
+
+    if (!humanVerify()) {
+        alert("Verification failed. Try again.");
+        return;
+    }
+
+    // SUCCESS
+    localStorage.setItem("loggedInUser", email);
+    window.location.href = "pm.html";
+});
 </script>
 </body>
 </html>
