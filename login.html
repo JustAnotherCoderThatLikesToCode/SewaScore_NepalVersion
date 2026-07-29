@@ -246,7 +246,7 @@ function rand(min,max){return Math.random()*(max-min)+min}
   }
 })();
 
-/* Parallax */
+/* ---------- Parallax ---------- */
 (function parallax(){
   const aur = document.getElementById('aurora'),
         fog = document.getElementById('fogLayer'),
@@ -329,7 +329,50 @@ function rand(min,max){return Math.random()*(max-min)+min}
   requestAnimationFrame(rafLoop);
 })();
 
-/* Popup-scale hover */
+/* ---------- Login logic (OLD — kept exactly as you asked) ---------- */
+(function login(){
+  const btn = document.getElementById("loginBtn");
+  const emailEl = document.getElementById("loginEmail");
+  const passEl = document.getElementById("loginPassword");
+  const err = document.getElementById("loginError");
+  if(!btn) return;
+
+  btn.addEventListener("click", () => {
+    const email = (emailEl && emailEl.value || '').trim();
+    const pass = (passEl && passEl.value) || '';
+
+    if (!email || !pass) {
+      showError("Please enter email and password.");
+      return;
+    }
+
+    const storedEmail = localStorage.getItem("userEmail");
+    const storedPass = localStorage.getItem("userPassword");
+
+    if (!storedEmail || !storedPass) {
+      showError("No account found. Create one first.");
+      return;
+    }
+
+    if (email !== storedEmail || pass !== storedPass) {
+      showError("Invalid credentials. Try again.");
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Signing in…";
+    setTimeout(()=> { window.location.href = "pm.html"; }, 700);
+  });
+
+  function showError(msg){
+    if (!err) return;
+    err.textContent = msg;
+    err.style.display = "block";
+    setTimeout(()=> { err.style.display = "none"; }, 3000);
+  }
+})();
+
+/* ---------- Popup-scale hover ---------- */
 (function(){
   const card = document.querySelector('.signup-card');
   if (!card) return;
@@ -349,7 +392,7 @@ function rand(min,max){return Math.random()*(max-min)+min}
   card.addEventListener('focusout', onLeave);
 })();
 
-/* Show/Hide password */
+/* ---------- Show/Hide password ---------- */
 (function(){
   const toggle = document.getElementById('togglePwd');
   const pwd = document.getElementById('loginPassword');
@@ -363,7 +406,7 @@ function rand(min,max){return Math.random()*(max-min)+min}
   });
 })();
 
-/* Back button */
+/* ---------- Back button ---------- */
 (function(){
   const back = document.querySelector('.card-back');
   if (!back) return;
@@ -382,79 +425,25 @@ function rand(min,max){return Math.random()*(max-min)+min}
   }, { passive: true });
 })();
 
-/* ⭐ BOT CHECK IMAGE SYSTEM ⭐ */
+/* ⭐⭐⭐ CLEAN REAL LOGIN SYSTEM — EXACTLY WHAT YOU ASKED ⭐⭐⭐ */
 
-const challenges = [
-  {
-    prompt: "Select the flag of Nepal",
-    correct: "nepal_flag",
-    options: ["nepal_flag", "india_flag", "china_flag"]
-  },
-  {
-    prompt: "Select Mount Everest",
-    correct: "everest",
-    options: ["everest", "random_mountain", "himalaya"]
-  },
-  {
-    prompt: "Select Kathmandu",
-    correct: "kathmandu",
-    options: ["kathmandu", "pokhara", "bhaktapur"]
+/* 1️⃣ Verification fail tracking */
+let verifyFails = parseInt(localStorage.getItem("verifyFails") || "0");
+let lockoutMinutes = parseInt(localStorage.getItem("lockoutMinutes") || "1");
+let lockoutUntil = parseInt(localStorage.getItem("lockoutUntil") || "0");
+
+/* Lockout check */
+function checkLockout() {
+  const now = Date.now();
+  if (now < lockoutUntil) {
+    const remaining = Math.ceil((lockoutUntil - now) / 60000);
+    alert(`Too many failed attempts. Try again in ${remaining} minute(s).`);
+    return true;
   }
-];
-
-const imageMap = {
-  nepal_flag: "https://upload.wikimedia.org/wikipedia/commons/9/9b/Flag_of_Nepal.svg",
-  india_flag: "https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg",
-  china_flag: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg",
-
-  everest: "https://i.imgur.com/8YQFQ8K.jpeg",
-  random_mountain: "https://i.imgur.com/0ZQZQ0y.jpeg",
-  himalaya: "https://i.imgur.com/8k7x1rF.jpeg",
-
-  kathmandu: "https://i.imgur.com/1xg7x0P.jpeg",
-  pokhara: "https://i.imgur.com/7p8x0kT.jpeg",
-  bhaktapur: "https://i.imgur.com/4Q0n1mS.jpeg"
-};
-
-function loadChallenge() {
-  const modal = document.getElementById("verifyModal");
-  const promptEl = document.getElementById("verifyPrompt");
-  const imgContainer = document.getElementById("verifyImages");
-
-  imgContainer.innerHTML = "";
-
-  const challenge = challenges[Math.floor(Math.random() * challenges.length)];
-  promptEl.textContent = challenge.prompt;
-
-  const shuffled = [...challenge.options].sort(() => Math.random() - 0.5);
-
-  shuffled.forEach(key => {
-    const img = document.createElement("img");
-    img.src = imageMap[key];
-    img.style.width = "90px";
-    img.style.height = "70px";
-    img.style.objectFit = "cover";
-    img.style.borderRadius = "8px";
-    img.style.cursor = "pointer";
-
-    img.dataset.correct = (key === challenge.correct ? "1" : "0");
-
-    img.onclick = () => {
-      if (key === challenge.correct) {
-        modal.style.display = "none";
-        window.passVerification();
-      } else {
-        alert("Incorrect. Try again.");
-        loadChallenge();
-      }
-    };
-
-    imgContainer.appendChild(img);
-  });
+  return false;
 }
 
-/* ⭐⭐⭐ REAL DB LOGIN + VERIFICATION ⭐⭐⭐ */
-
+/* 2️⃣ REAL DB LOGIN */
 document.getElementById("loginBtn").addEventListener("click", (event) => {
   event.stopImmediatePropagation();
 
@@ -476,21 +465,33 @@ document.getElementById("loginBtn").addEventListener("click", (event) => {
   .then(res => res.json())
   .then(data => {
 
+    /* 3️⃣ Account does NOT exist */
     if (data.status === "not_found") {
-      alert("This email is not registered.");
+      alert("Account doesn't exist.");
       return;
     }
 
+    /* Wrong password */
     if (data.status === "wrong_password") {
       alert("Incorrect password.");
       return;
     }
 
+    /* 4️⃣ Account exists → show verification */
     if (data.status === "exists") {
       document.getElementById("verifyModal").style.display = "flex";
       loadChallenge();
 
+      /* If verification succeeds */
       window.passVerification = () => {
+        verifyFails = 0;
+        lockoutMinutes = 1;
+        lockoutUntil = 0;
+
+        localStorage.setItem("verifyFails", "0");
+        localStorage.setItem("lockoutMinutes", "1");
+        localStorage.setItem("lockoutUntil", "0");
+
         localStorage.setItem("loggedInUser", email);
         window.location.href = "pm.html";
       };
@@ -498,72 +499,84 @@ document.getElementById("loginBtn").addEventListener("click", (event) => {
   });
 });
 
-/* ⭐⭐⭐ EXPONENTIAL LOCKOUT ⭐⭐⭐ */
+/* ⭐ BOT CHECK IMAGE SYSTEM ⭐ */
 
-let verifyFails = parseInt(localStorage.getItem("verifyFails") || "0");
-let lockoutMinutes = parseInt(localStorage.getItem("lockoutMinutes") || "1");
-let lockoutUntil = parseInt(localStorage.getItem("lockoutUntil") || "0");
+const challenges = [
+  { prompt: "Select the flag of Nepal", correct: "nepal_flag", options: ["nepal_flag","india_flag","china_flag"] },
+  { prompt: "Select Mount Everest", correct: "everest", options: ["everest","random_mountain","himalaya"] },
+  { prompt: "Select Kathmandu", correct: "kathmandu", options: ["kathmandu","pokhara","bhaktapur"] }
+];
 
-function checkLockout() {
-  const now = Date.now();
+const imageMap = {
+  nepal_flag: "https://upload.wikimedia.org/wikipedia/commons/9/9b/Flag_of_Nepal.svg",
+  india_flag: "https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg",
+  china_flag: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg",
+  everest: "https://i.imgur.com/8YQFQ8K.jpeg",
+  random_mountain: "https://i.imgur.com/0ZQZQ0y.jpeg",
+  himalaya: "https://i.imgur.com/8k7x1rF.jpeg",
+  kathmandu: "https://i.imgur.com/1xg7x0P.jpeg",
+  pokhara: "https://i.imgur.com/7p8x0kT.jpeg",
+  bhaktapur: "https://i.imgur.com/4Q0n1mS.jpeg"
+};
 
-  if (now < lockoutUntil) {
-    const remaining = Math.ceil((lockoutUntil - now) / 60000);
-    alert(`Too many failed attempts. Try again in ${remaining} minute(s).`);
-    return true;
-  }
+function loadChallenge() {
+  if (checkLockout()) return;
 
-  return false;
+  const modal = document.getElementById("verifyModal");
+  const promptEl = document.getElementById("verifyPrompt");
+  const imgContainer = document.getElementById("verifyImages");
+
+  imgContainer.innerHTML = "";
+
+  const challenge = challenges[Math.floor(Math.random() * challenges.length)];
+  promptEl.textContent = challenge.prompt;
+
+  const shuffled = [...challenge.options].sort(() => Math.random() - 0.5);
+
+  shuffled.forEach(key => {
+    const img = document.createElement("img");
+    img.src = imageMap[key];
+    img.style.width = "90px";
+    img.style.height = "70px";
+    img.style.objectFit = "cover";
+    img.style.borderRadius = "8px";
+    img.style.cursor = "pointer";
+
+    img.dataset.correct = key === challenge.correct ? "1" : "0";
+
+    img.onclick = () => {
+      if (key === challenge.correct) {
+        modal.style.display = "none";
+        window.passVerification();
+      } else {
+        /* 1️⃣ Verification fails */
+        verifyFails++;
+        localStorage.setItem("verifyFails", verifyFails.toString());
+
+        if (verifyFails >= 5) {
+          const now = Date.now();
+          lockoutUntil = now + lockoutMinutes * 60000;
+
+          localStorage.setItem("lockoutUntil", lockoutUntil.toString());
+
+          alert(`Too many failed attempts. Locked for ${lockoutMinutes} minute(s).`);
+
+          lockoutMinutes *= 2;
+          localStorage.setItem("lockoutMinutes", lockoutMinutes.toString());
+
+          modal.style.display = "none";
+          return;
+        }
+
+        alert("Incorrect. Try again.");
+        loadChallenge();
+      }
+    };
+
+    imgContainer.appendChild(img);
+  });
 }
 
-const originalPassVerification = window.passVerification;
-
-window.passVerification = () => {
-  verifyFails = 0;
-  lockoutMinutes = 1;
-  lockoutUntil = 0;
-
-  localStorage.setItem("verifyFails", "0");
-  localStorage.setItem("lockoutMinutes", "1");
-  localStorage.setItem("lockoutUntil", "0");
-
-  originalPassVerification();
-};
-
-const originalLoadChallenge = window.loadChallenge;
-
-window.loadChallenge = () => {
-  if (checkLockout()) return;
-  originalLoadChallenge();
-};
-
-document.addEventListener("click", function(e) {
-  if (e.target.tagName === "IMG" && e.target.parentElement.id === "verifyImages") {
-
-    const isCorrect = e.target.dataset.correct === "1";
-
-    if (!isCorrect) {
-      verifyFails++;
-      localStorage.setItem("verifyFails", verifyFails.toString());
-
-      if (verifyFails >= 5) {
-        const now = Date.now();
-        lockoutUntil = now + lockoutMinutes * 60000;
-
-        localStorage.setItem("lockoutUntil", lockoutUntil.toString());
-
-        alert(`Too many failed attempts. Locked for ${lockoutMinutes} minute(s).`);
-
-        lockoutMinutes *= 2;
-        localStorage.setItem("lockoutMinutes", lockoutMinutes.toString());
-
-        document.getElementById("verifyModal").style.display = "none";
-        return;
-      }
-    }
-  }
-});
 </script>
-
 </body>
 </html>
