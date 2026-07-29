@@ -154,10 +154,10 @@
 <!-- Login card -->
 <div class="signup-card-wrap">
   <div class="signup-card" role="form" aria-labelledby="loginTitle">
-    <div class="shimmer" aria-hidden="true"></div>
+    <div class="shimmer"></div>
 
-    <button class="card-back" type="button" aria-label="Go back">
-      <span class="card-back-icon" aria-hidden="true">←</span>
+    <button class="card-back" type="button">
+      <span class="card-back-icon">←</span>
       <span class="card-back-text">Back</span>
     </button>
 
@@ -165,31 +165,29 @@
     <div class="signup-sub">Log in to your SewaScore account.</div>
 
     <!-- ⭐ REAL LOGIN FORM ⭐ -->
-    <form action="login.php" method="POST" style="width:100%;">
+    <form style="width:100%;">
 
       <div class="field">
-        <input id="loginEmail" name="email" type="email" placeholder="Email" autocomplete="email" required />
+        <input id="loginEmail" type="email" placeholder="Email" required />
       </div>
 
       <div class="field">
         <div style="position:relative;">
-          <input id="loginPassword" name="password" type="password" placeholder="Password" autocomplete="current-password" required />
-        <button id="togglePwd" type="button" aria-label="Show password" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:transparent; border:0; cursor:pointer; font-size:14px; color:var(--muted); padding:6px;">👁</button>
+          <input id="loginPassword" type="password" placeholder="Password" required />
+          <button id="togglePwd" type="button" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:transparent; border:0; cursor:pointer;">👁</button>
         </div>
       </div>
 
-      <button class="login-btn" type="submit" aria-label="Log in">Log In</button>
+      <button class="login-btn" type="button" id="loginBtn">Log In</button>
 
     </form>
 
     <a class="signup-link" href="signup.html">Don't have an account? Create one</a>
 
-    <div id="loginError" class="error" role="alert" aria-live="polite"></div>
+    <div id="loginError" class="error"></div>
   </div>
 </div>
-
 <script>
-/* ---------- Reuse the same fog/dust/orb generators (lighter counts for login) ---------- */
 function rand(min,max){return Math.random()*(max-min)+min}
 
 /* Fog */
@@ -248,7 +246,7 @@ function rand(min,max){return Math.random()*(max-min)+min}
   }
 })();
 
-/* ---------- Parallax (same robust pause-on-card-hover logic) ---------- */
+/* Parallax */
 (function parallax(){
   const aur = document.getElementById('aurora'),
         fog = document.getElementById('fogLayer'),
@@ -331,50 +329,7 @@ function rand(min,max){return Math.random()*(max-min)+min}
   requestAnimationFrame(rafLoop);
 })();
 
-/* ---------- Login logic (matches signup storage behavior) ---------- */
-(function login(){
-  const btn = document.getElementById("loginBtn");
-  const emailEl = document.getElementById("loginEmail");
-  const passEl = document.getElementById("loginPassword");
-  const err = document.getElementById("loginError");
-  if(!btn) return;
-
-  btn.addEventListener("click", () => {
-    const email = (emailEl && emailEl.value || '').trim();
-    const pass = (passEl && passEl.value) || '';
-
-    if (!email || !pass) {
-      showError("Please enter email and password.");
-      return;
-    }
-
-    const storedEmail = localStorage.getItem("userEmail");
-    const storedPass = localStorage.getItem("userPassword");
-
-    if (!storedEmail || !storedPass) {
-      showError("No account found. Create one first.");
-      return;
-    }
-
-    if (email !== storedEmail || pass !== storedPass) {
-      showError("Invalid credentials. Try again.");
-      return;
-    }
-
-    btn.disabled = true;
-    btn.textContent = "Signing in…";
-    setTimeout(()=> { window.location.href = "pm.html"; }, 700);
-  });
-
-  function showError(msg){
-    if (!err) return;
-    err.textContent = msg;
-    err.style.display = "block";
-    setTimeout(()=> { err.style.display = "none"; }, 3000);
-  }
-})();
-
-/* ---------- Popup-scale hover micro-bounce ---------- */
+/* Popup-scale hover */
 (function(){
   const card = document.querySelector('.signup-card');
   if (!card) return;
@@ -394,7 +349,7 @@ function rand(min,max){return Math.random()*(max-min)+min}
   card.addEventListener('focusout', onLeave);
 })();
 
-/* ---------- Show/Hide password toggle ---------- */
+/* Show/Hide password */
 (function(){
   const toggle = document.getElementById('togglePwd');
   const pwd = document.getElementById('loginPassword');
@@ -407,6 +362,8 @@ function rand(min,max){return Math.random()*(max-min)+min}
     pwd.focus({preventScroll:true});
   });
 })();
+
+/* Back button */
 (function(){
   const back = document.querySelector('.card-back');
   if (!back) return;
@@ -424,60 +381,189 @@ function rand(min,max){return Math.random()*(max-min)+min}
     window.location.href = 'index.html';
   }, { passive: true });
 })();
-function humanVerify() {
-    const a = Math.floor(Math.random() * 10);
-    const b = Math.floor(Math.random() * 10);
-    const answer = prompt(`Human Check: What is ${a} + ${b}?`);
-    return parseInt(answer) === a + b;
+
+/* ⭐ BOT CHECK IMAGE SYSTEM ⭐ */
+
+const challenges = [
+  {
+    prompt: "Select the flag of Nepal",
+    correct: "nepal_flag",
+    options: ["nepal_flag", "india_flag", "china_flag"]
+  },
+  {
+    prompt: "Select Mount Everest",
+    correct: "everest",
+    options: ["everest", "random_mountain", "himalaya"]
+  },
+  {
+    prompt: "Select Kathmandu",
+    correct: "kathmandu",
+    options: ["kathmandu", "pokhara", "bhaktapur"]
+  }
+];
+
+const imageMap = {
+  nepal_flag: "https://upload.wikimedia.org/wikipedia/commons/9/9b/Flag_of_Nepal.svg",
+  india_flag: "https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg",
+  china_flag: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg",
+
+  everest: "https://i.imgur.com/8YQFQ8K.jpeg",
+  random_mountain: "https://i.imgur.com/0ZQZQ0y.jpeg",
+  himalaya: "https://i.imgur.com/8k7x1rF.jpeg",
+
+  kathmandu: "https://i.imgur.com/1xg7x0P.jpeg",
+  pokhara: "https://i.imgur.com/7p8x0kT.jpeg",
+  bhaktapur: "https://i.imgur.com/4Q0n1mS.jpeg"
+};
+
+function loadChallenge() {
+  const modal = document.getElementById("verifyModal");
+  const promptEl = document.getElementById("verifyPrompt");
+  const imgContainer = document.getElementById("verifyImages");
+
+  imgContainer.innerHTML = "";
+
+  const challenge = challenges[Math.floor(Math.random() * challenges.length)];
+  promptEl.textContent = challenge.prompt;
+
+  const shuffled = [...challenge.options].sort(() => Math.random() - 0.5);
+
+  shuffled.forEach(key => {
+    const img = document.createElement("img");
+    img.src = imageMap[key];
+    img.style.width = "90px";
+    img.style.height = "70px";
+    img.style.objectFit = "cover";
+    img.style.borderRadius = "8px";
+    img.style.cursor = "pointer";
+
+    img.dataset.correct = (key === challenge.correct ? "1" : "0");
+
+    img.onclick = () => {
+      if (key === challenge.correct) {
+        modal.style.display = "none";
+        window.passVerification();
+      } else {
+        alert("Incorrect. Try again.");
+        loadChallenge();
+      }
+    };
+
+    imgContainer.appendChild(img);
+  });
 }
 
-document.querySelector(".login-btn").addEventListener("click", function (e) {
-    e.preventDefault();
+/* ⭐⭐⭐ REAL DB LOGIN + VERIFICATION ⭐⭐⭐ */
 
-    const email = document.getElementById("loginEmail").value.trim();
-    const password = document.getElementById("loginPassword").value.trim();
+document.getElementById("loginBtn").addEventListener("click", (event) => {
+  event.stopImmediatePropagation();
 
-    if (!email || !password) {
-        alert("Please enter email and password.");
-        return;
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value.trim();
+
+  if (!email || !password) {
+    alert("Please enter email and password.");
+    return;
+  }
+
+  if (checkLockout()) return;
+
+  fetch("login.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password })
+  })
+  .then(res => res.json())
+  .then(data => {
+
+    if (data.status === "not_found") {
+      alert("This email is not registered.");
+      return;
     }
 
-    if (!humanVerify()) {
-        alert("Verification failed. Try again.");
-        return;
+    if (data.status === "wrong_password") {
+      alert("Incorrect password.");
+      return;
     }
 
-    // SUCCESS
-    localStorage.setItem("loggedInUser", email);
-    window.location.href = "pm.html";
+    if (data.status === "exists") {
+      document.getElementById("verifyModal").style.display = "flex";
+      loadChallenge();
+
+      window.passVerification = () => {
+        localStorage.setItem("loggedInUser", email);
+        window.location.href = "pm.html";
+      };
+    }
+  });
 });
-function humanVerify() {
-    const a = Math.floor(Math.random() * 10);
-    const b = Math.floor(Math.random() * 10);
-    const answer = prompt(`Human Check: What is ${a} + ${b}?`);
-    return parseInt(answer) === a + b;
+
+/* ⭐⭐⭐ EXPONENTIAL LOCKOUT ⭐⭐⭐ */
+
+let verifyFails = parseInt(localStorage.getItem("verifyFails") || "0");
+let lockoutMinutes = parseInt(localStorage.getItem("lockoutMinutes") || "1");
+let lockoutUntil = parseInt(localStorage.getItem("lockoutUntil") || "0");
+
+function checkLockout() {
+  const now = Date.now();
+
+  if (now < lockoutUntil) {
+    const remaining = Math.ceil((lockoutUntil - now) / 60000);
+    alert(`Too many failed attempts. Try again in ${remaining} minute(s).`);
+    return true;
+  }
+
+  return false;
 }
 
-document.querySelector(".login-btn").addEventListener("click", function (e) {
-    e.preventDefault();
+const originalPassVerification = window.passVerification;
 
-    const email = document.getElementById("loginEmail").value.trim();
-    const password = document.getElementById("loginPassword").value.trim();
+window.passVerification = () => {
+  verifyFails = 0;
+  lockoutMinutes = 1;
+  lockoutUntil = 0;
 
-    if (!email || !password) {
-        alert("Please enter email and password.");
+  localStorage.setItem("verifyFails", "0");
+  localStorage.setItem("lockoutMinutes", "1");
+  localStorage.setItem("lockoutUntil", "0");
+
+  originalPassVerification();
+};
+
+const originalLoadChallenge = window.loadChallenge;
+
+window.loadChallenge = () => {
+  if (checkLockout()) return;
+  originalLoadChallenge();
+};
+
+document.addEventListener("click", function(e) {
+  if (e.target.tagName === "IMG" && e.target.parentElement.id === "verifyImages") {
+
+    const isCorrect = e.target.dataset.correct === "1";
+
+    if (!isCorrect) {
+      verifyFails++;
+      localStorage.setItem("verifyFails", verifyFails.toString());
+
+      if (verifyFails >= 5) {
+        const now = Date.now();
+        lockoutUntil = now + lockoutMinutes * 60000;
+
+        localStorage.setItem("lockoutUntil", lockoutUntil.toString());
+
+        alert(`Too many failed attempts. Locked for ${lockoutMinutes} minute(s).`);
+
+        lockoutMinutes *= 2;
+        localStorage.setItem("lockoutMinutes", lockoutMinutes.toString());
+
+        document.getElementById("verifyModal").style.display = "none";
         return;
+      }
     }
-
-    if (!humanVerify()) {
-        alert("Verification failed. Try again.");
-        return;
-    }
-
-    // SUCCESS
-    localStorage.setItem("loggedInUser", email);
-    window.location.href = "pm.html";
+  }
 });
 </script>
+
 </body>
 </html>
