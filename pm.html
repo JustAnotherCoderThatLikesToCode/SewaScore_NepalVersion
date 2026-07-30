@@ -430,23 +430,19 @@
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-  const user = localStorage.getItem("loggedInUser");
-if (!user) {
-  window.location.href = "login.html";
-}
-
-/* LOGIN CHECK (optional redirect) */
-const user = localStorage.getItem("loggedInUser");
-if (!user) {
-  alert("You must log in to rate the Prime Minister.");
-  window.location.href = "login.html";
-}
-
-/* Set profile email */
+/* ⭐ SET PROFILE EMAIL ⭐ */
 document.getElementById("loggedInAs").textContent =
-  "Logged in as: " + localStorage.getItem("loggedInUser");
+  "Logged in as: " + (localStorage.getItem("loggedInUser") || "Guest");
 
-/* Background FX init */
+/* ⭐ REMOVE ANY OLD LOGIN BLOCK ⭐ */
+const loginBlock = document.getElementById("loginBlock");
+if (loginBlock) loginBlock.style.display = "none";
+
+/* ⭐ REMOVE VERIFICATION MODAL ON PM PAGE ⭐ */
+const verifyModal = document.getElementById("verifyModal");
+if (verifyModal) verifyModal.style.display = "none";
+
+/* ⭐ BACKGROUND FX ⭐ */
 const rand = (a,b) => a + Math.random() * (b - a);
 
 (function fog(){
@@ -503,7 +499,7 @@ window.addEventListener("mousemove", e => {
     `translate(${x*10}px, ${y*10}px)`;
 });
 
-/* Main stars */
+/* ⭐ MAIN STAR RATING ⭐ */
 let rating = 0;
 document.querySelectorAll(".star").forEach(star => {
   star.addEventListener("click", () => {
@@ -514,7 +510,7 @@ document.querySelectorAll(".star").forEach(star => {
   });
 });
 
-/* Deep rater */
+/* ⭐ DEEP RATER ⭐ */
 let deepRatings = {};
 document.querySelectorAll(".deep-stars").forEach(group => {
   const field = group.dataset.field;
@@ -535,13 +531,13 @@ document.querySelectorAll(".deep-stars").forEach(group => {
   });
 });
 
-/* Toggle deep rater */
+/* ⭐ TOGGLE DEEP RATER ⭐ */
 document.getElementById("deepToggle").addEventListener("click", () => {
   const deepRater = document.getElementById("deepRater");
   deepRater.classList.toggle("open");
 });
 
-/* Confetti */
+/* ⭐ CONFETTI ⭐ */
 function confettiBurst() {
   const duration = 1000;
   const end = Date.now() + duration;
@@ -564,7 +560,7 @@ function confettiBurst() {
   })();
 }
 
-/* Submit */
+/* ⭐ SUBMIT ⭐ */
 document.getElementById("submitBtn").addEventListener("click", () => {
   const feedback = document.getElementById("feedback").value.trim();
   const popup = document.getElementById("successPopup");
@@ -578,113 +574,12 @@ document.getElementById("submitBtn").addEventListener("click", () => {
   console.log("Feedback:", feedback);
 });
 
-/* Logout */
+/* ⭐ LOGOUT ⭐ */
 function logout() {
   localStorage.removeItem("loggedInUser");
   window.location.href = "login.html";
 }
-</script>
 
-<!-- IMAGE VERIFICATION MODAL -->
-<div id="verifyModal" style="
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(6px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999999;
-">
-  <div style="
-    background: white;
-    padding: 26px;
-    border-radius: 16px;
-    width: 360px;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-  ">
-    <h2 style="margin-top:0;">Human Verification</h2>
-    <p id="verifyPrompt" style="margin-bottom: 18px; font-size: 1rem;">
-      Loading challenge…
-    </p>
-    <div id="verifyImages" style="
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-    "></div>
-  </div>
-</div>
-
-<script>
-const challenges = [
-  {
-    prompt: "Select the flag of Nepal",
-    correct: "nepal_flag",
-    options: ["nepal_flag", "india_flag", "china_flag"]
-  },
-  {
-    prompt: "Select the picture of Mount Everest",
-    correct: "everest",
-    options: ["everest", "random_mountain", "himalaya"]
-  },
-  {
-    prompt: "Select the picture of Kathmandu",
-    correct: "kathmandu",
-    options: ["kathmandu", "pokhara", "bhaktapur"]
-  }
-];
-const imageMap = {
-  nepal_flag: "https://upload.wikimedia.org/wikipedia/commons/9/9b/Flag_of_Nepal.svg",
-  india_flag: "https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg",
-  china_flag: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg",
-
-  // ⭐ NEW CORS-SAFE IMAGES ⭐
-  everest: "https://i.imgur.com/8YQFQ8K.jpeg",
-  random_mountain: "https://i.imgur.com/0ZQZQ0y.jpeg",
-  himalaya: "https://i.imgur.com/8k7x1rF.jpeg",
-
-  kathmandu: "https://i.imgur.com/1xg7x0P.jpeg",
-  pokhara: "https://i.imgur.com/7p8x0kT.jpeg",
-  bhaktapur: "https://i.imgur.com/4Q0n1mS.jpeg"
-};
-
-function loadChallenge() {
-  const modal = document.getElementById("verifyModal");
-  const promptEl = document.getElementById("verifyPrompt");
-  const imgContainer = document.getElementById("verifyImages");
-
-  imgContainer.innerHTML = "";
-
-  const challenge = challenges[Math.floor(Math.random() * challenges.length)];
-  promptEl.textContent = challenge.prompt;
-
-  const shuffled = [...challenge.options].sort(() => Math.random() - 0.5);
-
-  shuffled.forEach(key => {
-    const img = document.createElement("img");
-    img.src = imageMap[key];
-    img.style.width = "90px";
-    img.style.height = "70px";
-    img.style.objectFit = "cover";
-    img.style.borderRadius = "8px";
-    img.style.cursor = "pointer";
-    img.style.border = "2px solid transparent";
-
-    img.onclick = () => {
-      if (key === challenge.correct) {
-        modal.style.display = "none";
-      } else {
-        alert("Incorrect. Try again.");
-        loadChallenge();
-      }
-    };
-
-    imgContainer.appendChild(img);
-  });
-}
-
-window.addEventListener("load", loadChallenge);
 </script>
 
 <!-- SUCCESS POPUP -->
