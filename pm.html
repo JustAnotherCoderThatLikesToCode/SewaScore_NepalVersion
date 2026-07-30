@@ -430,6 +430,11 @@
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
+  const user = localStorage.getItem("loggedInUser");
+if (!user) {
+  window.location.href = "login.html";
+}
+
 /* LOGIN CHECK (optional redirect) */
 const user = localStorage.getItem("loggedInUser");
 if (!user) {
