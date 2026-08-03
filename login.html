@@ -6,7 +6,6 @@
 <title>SewaScore — Log in</title>
 
 <style>
-  /* Keep the same variables and core styles as your signup */
   :root{
     --accent-a:#06b6d4;
     --accent-b:#7c3aed;
@@ -137,6 +136,43 @@
 @media (prefers-reduced-motion: reduce){
   .card-back{ transition:none !important; }
 }
+/* Wrapper to center the button and add spacing */
+.guest-btn-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 14px; /* space below login button */
+}
+
+/* SEWA Score outline button */
+.guest-outline-btn {
+  width: 150px;                 /* smaller width */
+  padding: 9px 0;               /* smaller height */
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  background: transparent;      /* opacity 0 */
+  border: 2px solid transparent;
+  cursor: pointer;
+  color: #4b6cff;               /* SEWA blue */
+  transition: all 0.2s ease;
+
+  /* Gradient outline */
+  border-image: linear-gradient(135deg, #4b6cff, #7f5bff) 1;
+}
+
+/* Hover effect */
+.guest-outline-btn:hover {
+  color: white;
+  background: linear-gradient(135deg, #4b6cff, #7f5bff);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Press effect */
+.guest-outline-btn:active {
+  transform: translateY(0px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
 
 </style>
 </head>
@@ -179,6 +215,13 @@
       </div>
 
       <button class="login-btn" type="button" id="loginBtn">Log In</button>
+<div class="guest-btn-wrapper">
+  <button id="guestLoginBtn" class="guest-outline-btn">
+    Login as Guest
+  </button>
+</div>
+
+
 
     </form>
 
@@ -425,7 +468,7 @@ function rand(min,max){return Math.random()*(max-min)+min}
   }, { passive: true });
 })();
 
-/* ⭐⭐⭐ CLEAN REAL LOGIN SYSTEM — EXACTLY WHAT YOU ASKED ⭐⭐⭐ */
+/* ⭐⭐⭐ CLEAN REAL LOGIN + GUEST MODE ⭐⭐⭐ */
 
 /* 1️⃣ Verification fail tracking */
 let verifyFails = parseInt(localStorage.getItem("verifyFails") || "0");
@@ -443,7 +486,7 @@ function checkLockout() {
   return false;
 }
 
-/* 2️⃣ REAL DB LOGIN */
+/* ⭐ REAL LOGIN BUTTON ⭐ */
 document.getElementById("loginBtn").addEventListener("click", (event) => {
   event.stopImmediatePropagation();
 
@@ -465,39 +508,36 @@ document.getElementById("loginBtn").addEventListener("click", (event) => {
   .then(res => res.json())
   .then(data => {
 
-    /* 3️⃣ Account does NOT exist */
     if (data.status === "not_found") {
       alert("Account doesn't exist.");
       return;
     }
 
-    /* Wrong password */
     if (data.status === "wrong_password") {
       alert("Incorrect password.");
       return;
     }
 
-    /* 4️⃣ Account exists → show verification */
     if (data.status === "exists") {
+      window.isGuestMode = false;     // REAL LOGIN
+      window.loginEmail = email;      // store email safely
+
       document.getElementById("verifyModal").style.display = "flex";
       loadChallenge();
-
-      /* If verification succeeds */
-      window.passVerification = () => {
-        verifyFails = 0;
-        lockoutMinutes = 1;
-        lockoutUntil = 0;
-
-        localStorage.setItem("verifyFails", "0");
-        localStorage.setItem("lockoutMinutes", "1");
-        localStorage.setItem("lockoutUntil", "0");
-
-        localStorage.setItem("loggedInUser", email);
-        window.location.href = "pm.html";
-      };
     }
   });
 });
+
+/* ⭐ GUEST LOGIN BUTTON ⭐ */
+document.getElementById("guestLoginBtn").onclick = () => {
+  if (checkLockout()) return;
+
+  window.isGuestMode = true;   // mark guest mode
+  window.loginEmail = null;    // prevent overwriting real login
+
+  document.getElementById("verifyModal").style.display = "flex";
+  loadChallenge();
+};
 
 /* ⭐ BOT CHECK IMAGE SYSTEM ⭐ */
 
@@ -542,14 +582,11 @@ function loadChallenge() {
     img.style.borderRadius = "8px";
     img.style.cursor = "pointer";
 
-    img.dataset.correct = key === challenge.correct ? "1" : "0";
-
     img.onclick = () => {
       if (key === challenge.correct) {
         modal.style.display = "none";
         window.passVerification();
       } else {
-        /* 1️⃣ Verification fails */
         verifyFails++;
         localStorage.setItem("verifyFails", verifyFails.toString());
 
@@ -572,11 +609,24 @@ function loadChallenge() {
         loadChallenge();
       }
     };
-
     imgContainer.appendChild(img);
   });
 }
 
+/* ⭐ FINAL — SAFE VERIFICATION RESULT ⭐ */
+window.passVerification = function () {
+  localStorage.removeItem("verifyFails");
+  localStorage.removeItem("lockoutMinutes");
+  localStorage.removeItem("lockoutUntil");
+
+  if (window.isGuestMode) {
+    localStorage.setItem("loggedInUser", "Guest");
+  } else {
+    localStorage.setItem("loggedInUser", window.loginEmail);
+  }
+
+  window.location.href = "pm.html";
+};
 </script>
 </body>
 </html>
