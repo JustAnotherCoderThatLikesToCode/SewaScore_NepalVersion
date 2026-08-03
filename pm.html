@@ -651,20 +651,16 @@ window.addEventListener("load", loadChallenge);
 
 <!-- ⭐ HUMAN VERIFICATION TRIGGER (CORRECT LOCATION) ⭐ -->
 <script>
-if (localStorage.getItem("loggedInUser")) {
-    document.getElementById("verifyModal").style.display = "flex";
-    loadChallenge();
-} else {
-    alert("You must log in to access this page.");
-    window.location.href = "login.html";
-}
+const user = localStorage.getItem("loggedInUser");
 
-/* Set profile email again (unchanged) */
-document.getElementById("loggedInAs").textContent =
-  "Logged in as: " + localStorage.getItem("loggedInUser");
+const displayEl = document.getElementById("loggedInAs");
+
+if (displayEl) {
+    displayEl.textContent = "Logged in as: " + (user ? user : "Unknown User");
+}
 </script>
 
-
+<p id="loggedInAs"></p>
 <!-- SUCCESS POPUP -->
 <div id="successPopup" style="
   position: fixed;
