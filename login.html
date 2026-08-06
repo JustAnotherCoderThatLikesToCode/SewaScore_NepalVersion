@@ -519,8 +519,8 @@ document.getElementById("loginBtn").addEventListener("click", (event) => {
     }
 
     if (data.status === "exists") {
-      window.isGuestMode = false;     // REAL LOGIN
-      window.loginEmail = email;      // store email safely
+      window.isGuestMode = false;     
+      window.loginEmail = email;      
 
       document.getElementById("verifyModal").style.display = "flex";
       loadChallenge();
@@ -532,8 +532,8 @@ document.getElementById("loginBtn").addEventListener("click", (event) => {
 document.getElementById("guestLoginBtn").onclick = () => {
   if (checkLockout()) return;
 
-  window.isGuestMode = true;   // mark guest mode
-  window.loginEmail = null;    // prevent overwriting real login
+  window.isGuestMode = true;
+  window.loginEmail = "Guest"; // store guest identity
 
   document.getElementById("verifyModal").style.display = "flex";
   loadChallenge();
@@ -609,6 +609,7 @@ function loadChallenge() {
         loadChallenge();
       }
     };
+
     imgContainer.appendChild(img);
   });
 }
@@ -619,11 +620,7 @@ window.passVerification = function () {
   localStorage.removeItem("lockoutMinutes");
   localStorage.removeItem("lockoutUntil");
 
-  if (window.isGuestMode) {
-    localStorage.setItem("loggedInUser", "Guest");
-  } else {
-    localStorage.setItem("loggedInUser", window.loginEmail);
-  }
+  localStorage.setItem("loggedInUser", window.loginEmail);
 
   window.location.href = "pm.html";
 };
