@@ -485,6 +485,7 @@ function checkLockout() {
   }
   return false;
 }
+<!-- ⭐⭐⭐ CLEAN REAL LOGIN + GUEST MODE ⭐⭐⭐ -->
 
 /* ⭐ REAL LOGIN BUTTON ⭐ */
 document.getElementById("loginBtn").addEventListener("click", (event) => {
@@ -497,8 +498,6 @@ document.getElementById("loginBtn").addEventListener("click", (event) => {
     alert("Please enter email and password.");
     return;
   }
-
-  if (checkLockout()) return;
 
   fetch("login.php", {
     method: "POST",
@@ -519,111 +518,30 @@ document.getElementById("loginBtn").addEventListener("click", (event) => {
     }
 
     if (data.status === "exists") {
-      window.isGuestMode = false;     
-      window.loginEmail = email;      
+      window.isGuestMode = false;
+      window.loginEmail = email;
 
-      document.getElementById("verifyModal").style.display = "flex";
-      loadChallenge();
+      // ⭐ Save email for pm.html
+      localStorage.setItem("loggedInUser", window.loginEmail);
+
+      // ⭐ Go directly to pm.html
+      window.location.href = "pm.html";
     }
   });
 });
 
 /* ⭐ GUEST LOGIN BUTTON ⭐ */
 document.getElementById("guestLoginBtn").onclick = () => {
-  if (checkLockout()) return;
-
   window.isGuestMode = true;
-  window.loginEmail = "Guest"; // store guest identity
+  window.loginEmail = "Guest";
 
-  document.getElementById("verifyModal").style.display = "flex";
-  loadChallenge();
-};
+  // ⭐ Save guest mode for pm.html
+  localStorage.setItem("loggedInUser", "Guest");
 
-/* ⭐ BOT CHECK IMAGE SYSTEM ⭐ */
-
-const challenges = [
-  { prompt: "Select the flag of Nepal", correct: "nepal_flag", options: ["nepal_flag","india_flag","china_flag"] },
-  { prompt: "Select Mount Everest", correct: "everest", options: ["everest","random_mountain","himalaya"] },
-  { prompt: "Select Kathmandu", correct: "kathmandu", options: ["kathmandu","pokhara","bhaktapur"] }
-];
-
-const imageMap = {
-  nepal_flag: "https://upload.wikimedia.org/wikipedia/commons/9/9b/Flag_of_Nepal.svg",
-  india_flag: "https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg",
-  china_flag: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg",
-  everest: "https://i.imgur.com/8YQFQ8K.jpeg",
-  random_mountain: "https://i.imgur.com/0ZQZQ0y.jpeg",
-  himalaya: "https://i.imgur.com/8k7x1rF.jpeg",
-  kathmandu: "https://i.imgur.com/1xg7x0P.jpeg",
-  pokhara: "https://i.imgur.com/7p8x0kT.jpeg",
-  bhaktapur: "https://i.imgur.com/4Q0n1mS.jpeg"
-};
-
-function loadChallenge() {
-  if (checkLockout()) return;
-
-  const modal = document.getElementById("verifyModal");
-  const promptEl = document.getElementById("verifyPrompt");
-  const imgContainer = document.getElementById("verifyImages");
-
-  imgContainer.innerHTML = "";
-
-  const challenge = challenges[Math.floor(Math.random() * challenges.length)];
-  promptEl.textContent = challenge.prompt;
-
-  const shuffled = [...challenge.options].sort(() => Math.random() - 0.5);
-
-  shuffled.forEach(key => {
-    const img = document.createElement("img");
-    img.src = imageMap[key];
-    img.style.width = "90px";
-    img.style.height = "70px";
-    img.style.objectFit = "cover";
-    img.style.borderRadius = "8px";
-    img.style.cursor = "pointer";
-
-    img.onclick = () => {
-      if (key === challenge.correct) {
-        modal.style.display = "none";
-        window.passVerification();
-      } else {
-        verifyFails++;
-        localStorage.setItem("verifyFails", verifyFails.toString());
-
-        if (verifyFails >= 5) {
-          const now = Date.now();
-          lockoutUntil = now + lockoutMinutes * 60000;
-
-          localStorage.setItem("lockoutUntil", lockoutUntil.toString());
-
-          alert(`Too many failed attempts. Locked for ${lockoutMinutes} minute(s).`);
-
-          lockoutMinutes *= 2;
-          localStorage.setItem("lockoutMinutes", lockoutMinutes.toString());
-
-          modal.style.display = "none";
-          return;
-        }
-
-        alert("Incorrect. Try again.");
-        loadChallenge();
-      }
-    };
-
-    imgContainer.appendChild(img);
-  });
-}
-
-/* ⭐ FINAL — SAFE VERIFICATION RESULT ⭐ */
-window.passVerification = function () {
-  localStorage.removeItem("verifyFails");
-  localStorage.removeItem("lockoutMinutes");
-  localStorage.removeItem("lockoutUntil");
-
-  localStorage.setItem("loggedInUser", window.loginEmail);
-
+  // ⭐ Go directly to pm.html
   window.location.href = "pm.html";
 };
+
 </script>
 </body>
 </html>
