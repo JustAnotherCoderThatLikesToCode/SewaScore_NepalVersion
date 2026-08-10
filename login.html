@@ -530,17 +530,25 @@ document.getElementById("loginBtn").addEventListener("click", (event) => {
   });
 });
 
-document.getElementById("guestLoginBtn").onclick = () => {
-  // ⭐ Mark this session as guest mode
-  window.isGuestMode = true;
+document.addEventListener("DOMContentLoaded", () => {
+  const guestBtn = document.getElementById("guestLoginBtn");
 
-  // ⭐ Save the guest identity so pm.html knows it's a guest
-  localStorage.setItem("loggedInUser", "Guest");
-  localStorage.setItem("loginType", "guest");
+  if (!guestBtn) {
+    console.log("Guest button not found!");
+    return;
+  }
 
-  // ⭐ Go straight to pm.html
-  window.location.href = "pm.html";
-};
+  guestBtn.onclick = () => {
+    console.log("Guest login clicked!");
+
+    // ⭐ Mark guest mode
+    localStorage.setItem("loggedInUser", "Guest");
+    localStorage.setItem("loginType", "guest");
+
+    // ⭐ Redirect immediately
+    window.location.href = "pm.html";
+  };
+});
 
 
 </script>
