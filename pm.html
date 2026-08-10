@@ -575,6 +575,15 @@ function logout() {
   localStorage.removeItem("loggedInUser");
   window.location.href = "login.html";
 }
+const user = localStorage.getItem("loggedInUser");
+const type = localStorage.getItem("loginType");
+
+if (type === "guest") {
+  document.getElementById("loggedInAs").textContent = "Logged in as: Guest";
+} else {
+  document.getElementById("loggedInAs").textContent = "Logged in as: " + user;
+}
+
 </script>
 
 

@@ -531,15 +531,17 @@ document.getElementById("loginBtn").addEventListener("click", (event) => {
 });
 
 document.getElementById("guestLoginBtn").onclick = () => {
+  // ⭐ Mark this session as guest mode
   window.isGuestMode = true;
-  window.loginEmail = "Guest";
 
-  // ⭐ Save guest mode for pm.html
+  // ⭐ Save the guest identity so pm.html knows it's a guest
   localStorage.setItem("loggedInUser", "Guest");
+  localStorage.setItem("loginType", "guest");
 
-  // ⭐ Go directly to pm.html
+  // ⭐ Go straight to pm.html
   window.location.href = "pm.html";
 };
+
 
 </script>
 </body>
