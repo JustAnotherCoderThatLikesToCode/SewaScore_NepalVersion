@@ -216,9 +216,9 @@
 
       <button class="login-btn" type="button" id="loginBtn">Log In</button>
 <div class="guest-btn-wrapper">
-  <button id="guestLoginBtn" class="guest-outline-btn">
-    Login as Guest
-  </button>
+<button id="guestLoginBtn" type="button" class="guest-outline-btn">
+  Login as Guest
+</button>
 </div>
 
 
@@ -448,7 +448,6 @@ function rand(min,max){return Math.random()*(max-min)+min}
     pwd.focus({preventScroll:true});
   });
 })();
-
 /* ---------- Back button ---------- */
 (function(){
   const back = document.querySelector('.card-back');
@@ -485,51 +484,85 @@ function checkLockout() {
   }
   return false;
 }
-<!-- ⭐⭐⭐ CLEAN REAL LOGIN + GUEST MODE ⭐⭐⭐ -->
 
 /* ⭐ REAL LOGIN BUTTON ⭐ */
-document.getElementById("loginBtn").addEventListener("click", (event) => {
-  event.stopImmediatePropagation();
+const loginBtnEl = document.getElementById("loginBtn");
+if (loginBtnEl) {
+  loginBtnEl.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopImmediatePropagation();
 
-  const email = document.getElementById("loginEmail").value.trim();
-  const password = document.getElementById("loginPassword").value.trim();
+    const email = (document.getElementById("loginEmail").value || '').trim();
+    const password = (document.getElementById("loginPassword").value || '').trim();
 
-  if (!email || !password) {
-    alert("Please enter email and password.");
-    return;
-  }
-
-  fetch("login.php", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
-  })
-  .then(res => res.json())
-  .then(data => {
-
-    if (data.status === "not_found") {
-      alert("Account doesn't exist.");
+    if (!email || !password) {
+      alert("Please enter email and password.");
       return;
     }
 
-    if (data.status === "wrong_password") {
-      alert("Incorrect password.");
-      return;
-    }
+    // Optional: check lockout
+    if (checkLockout()) return;
 
-    if (data.status === "exists") {
-      window.isGuestMode = false;
-      window.loginEmail = email;
+    fetch("login.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "not_found") {
+        alert("Account doesn't exist.");
+        return;
+      }
 
-      // ⭐ Save email for pm.html
-      localStorage.setItem("loggedInUser", window.loginEmail);
+      if (data.status === "wrong_password") {
+        // increment fail counter and possibly set lockout
+        verifyFails = (verifyFails || 0) + 1;
+        localStorage.setItem("verifyFails", String(verifyFails));
+        if (verifyFails >= 5) {
+          lockoutMinutes = Math.min(60, lockoutMinutes * 2);
+          lockoutUntil = Date.now() + lockoutMinutes * 60000;
+          localStorage.setItem("lockoutMinutes", String(lockoutMinutes));
+          localStorage.setItem("lockoutUntil", String(lockoutUntil));
+        }
+        alert("Incorrect password.");
+        return;
+      }
 
-      // ⭐ Go directly to pm.html
-      window.location.href = "pm.html";
-    }
+      if (data.status === "exists") {
+        window.isGuestMode = false;
+        window.loginEmail = email;
+
+        // Save email for pm.html
+        localStorage.setItem("loggedInUser", window.loginEmail);
+        localStorage.removeItem("loginType");
+
+        // Go directly to pm.html
+        window.location.href = "pm.html";
+      }
+    })
+    .catch(err => {
+      console.error("Login request failed", err);
+      alert("Login failed. Try again later.");
+    });
   });
-});
+}
 
+/* ---------- Show/Hide password ---------- */
+(function(){
+  const toggle = document.getElementById('togglePwd');
+  const pwd = document.getElementById('loginPassword');
+  if (!toggle || !pwd) return;
+  toggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    const isPwd = pwd.type === 'password';
+    pwd.type = isPwd ? 'text' : 'password';
+    toggle.setAttribute('aria-label', isPwd ? 'Hide password' : 'Show password');
+    pwd.focus({preventScroll:true});
+  });
+})();
+
+/* ---------- Guest login redirect (safe, prevents form submit) ---------- */
 document.addEventListener("DOMContentLoaded", () => {
   const guestBtn = document.getElementById("guestLoginBtn");
   if (!guestBtn) {
@@ -537,11 +570,18 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  // Ensure button won't submit a form
+  guestBtn.type = "button";
+
   // Remove any previous handler to avoid conflicts
   guestBtn.onclick = null;
 
-  guestBtn.addEventListener("click", () => {
-    console.log("Guest login clicked");
+  guestBtn.addEventListener("click", (e) => {
+    // Prevent any default form submit / page refresh
+    if (e && typeof e.preventDefault === "function") e.preventDefault();
+
+    // Debug line (remove if you want)
+    console.log("Guest login clicked — redirecting to pm.html");
 
     // Mark guest session and signal pm.html
     localStorage.setItem("loggedInUser", "Guest");
@@ -552,7 +592,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-
+/* ---------- Optional: cleanup on page unload (not required) ---------- */
+window.addEventListener('beforeunload', () => {
+  // no-op; keep localStorage values so pm.html can read them
+});
 </script>
 </body>
 </html>
