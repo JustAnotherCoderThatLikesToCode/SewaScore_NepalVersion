@@ -570,19 +570,25 @@ document.getElementById("submitBtn").addEventListener("click", () => {
   console.log("Feedback:", feedback);
 });
 
-/* ⭐ LOGOUT ⭐ */
 function logout() {
   localStorage.removeItem("loggedInUser");
+  localStorage.removeItem("loginType");
   window.location.href = "login.html";
 }
+
+// Show who is logged in and whether it's guest mode
 const user = localStorage.getItem("loggedInUser");
 const type = localStorage.getItem("loginType");
+const displayEl = document.getElementById("loggedInAs");
 
-if (type === "guest") {
-  document.getElementById("loggedInAs").textContent = "Logged in as: Guest";
-} else {
-  document.getElementById("loggedInAs").textContent = "Logged in as: " + user;
+if (displayEl) {
+  if (type === "guest") {
+    displayEl.textContent = "Logged in as: Guest";
+  } else {
+    displayEl.textContent = "Logged in as: " + (user || "Unknown User");
+  }
 }
+
 </script>
 
 

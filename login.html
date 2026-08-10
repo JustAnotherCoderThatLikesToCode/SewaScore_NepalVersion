@@ -532,22 +532,24 @@ document.getElementById("loginBtn").addEventListener("click", (event) => {
 
 document.addEventListener("DOMContentLoaded", () => {
   const guestBtn = document.getElementById("guestLoginBtn");
-
   if (!guestBtn) {
-    console.log("Guest button not found!");
+    console.error("Guest button not found: #guestLoginBtn");
     return;
   }
 
-  guestBtn.onclick = () => {
-    console.log("Guest login clicked!");
+  // Remove any previous handler to avoid conflicts
+  guestBtn.onclick = null;
 
-    // ⭐ Mark guest mode
+  guestBtn.addEventListener("click", () => {
+    console.log("Guest login clicked");
+
+    // Mark guest session and signal pm.html
     localStorage.setItem("loggedInUser", "Guest");
     localStorage.setItem("loginType", "guest");
 
-    // ⭐ Redirect immediately
+    // Immediate redirect to pm.html
     window.location.href = "pm.html";
-  };
+  });
 });
 
 
