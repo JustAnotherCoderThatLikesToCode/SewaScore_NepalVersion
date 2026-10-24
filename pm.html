@@ -555,19 +555,63 @@ function confettiBurst() {
     }
   })();
 }
-
-/* ⭐ SUBMIT ⭐ */
+/* ⭐ SUBMIT BUTTON ⭐ */
 document.getElementById("submitBtn").addEventListener("click", () => {
-  const feedback = document.getElementById("feedback").value.trim();
-  const popup = document.getElementById("successPopup");
-  popup.style.display = "flex";
-  confettiBurst();
-  setTimeout(() => {
-    popup.style.display = "none";
-  }, 2000);
-  console.log("Main Rating:", rating);
-  console.log("Deep Ratings:", deepRatings);
-  console.log("Feedback:", feedback);
+
+  const user = localStorage.getItem("loggedInUser");
+
+  if (!user || user === "Guest") {
+    alert("You must be logged in to submit a rating.");
+    return;
+  }
+
+  const feedback =
+    document.getElementById("feedback").value.trim();
+
+  if (rating === 0) {
+    alert("Please select a rating.");
+    return;
+  }
+
+  fetch("save_rating.php", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      email: user,
+      rating: rating,
+      comment: feedback
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+
+    if (data.success) {
+
+      const popup =
+        document.getElementById("successPopup");
+
+      popup.style.display = "flex";
+
+      confettiBurst();
+
+      setTimeout(() => {
+        popup.style.display = "none";
+      }, 2000);
+
+    } else {
+
+      alert(data.message || "Failed to save rating.");
+
+    }
+
+  })
+  .catch(error => {
+    console.error(error);
+    alert("Server error.");
+  });
+
 });
 
 function logout() {
@@ -576,19 +620,20 @@ function logout() {
   window.location.href = "login.html";
 }
 
-// Show who is logged in and whether it's guest mode
-const user = localStorage.getItem("loggedInUser");
-const type = localStorage.getItem("loginType");
-const displayEl = document.getElementById("loggedInAs");
+// Ensure this runs after the DOM and other initialization
+document.addEventListener("DOMContentLoaded", () => {
+  const user = localStorage.getItem("loggedInUser");
+  const type = localStorage.getItem("loginType");
+  const displayEl = document.getElementById("loggedInAs");
 
-if (displayEl) {
-  if (type === "guest") {
-    displayEl.textContent = "Logged in as: Guest";
-  } else {
-    displayEl.textContent = "Logged in as: " + (user || "Unknown User");
+  if (displayEl) {
+    if (type === "guest") {
+      displayEl.textContent = "Logged in as: Guest";
+    } else {
+      displayEl.textContent = "Logged in as: " + (user || "Unknown User");
+    }
   }
-}
-
+});
 </script>
 
 
